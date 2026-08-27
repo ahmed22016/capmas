@@ -6,7 +6,6 @@
 <title>منصة متابعة متقدمي مشروع الحصر الخرائطي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- Supabase SDK & SheetJS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -56,12 +55,13 @@
     margin-bottom:22px;
     position:relative;
     overflow:hidden;
+    flex-wrap:wrap;
+    gap:10px;
   }
   .topbar::after{
     content:"";
     position:absolute;inset:0;
-    background:
-      radial-gradient(circle at 90% -20%, rgba(185,139,42,.35), transparent 55%);
+    background:radial-gradient(circle at 90% -20%, rgba(185,139,42,.35), transparent 55%);
     pointer-events:none;
   }
   .topbar .title{display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
@@ -88,6 +88,10 @@
   .btn-outline{background:#fff;color:var(--brand);border:1px solid var(--line);}
   .btn-outline:hover{border-color:var(--brand-2);}
   .btn-sm{padding:6px 11px;font-size:12.5px;border-radius:8px;}
+  .btn-danger-o{background:#fff;color:var(--bad);border:1px solid var(--bad-soft);}
+  .btn-success{background:var(--ok);color:#fff;}
+  .btn-success:hover{filter:brightness(1.05);}
+  .btn-disabled{opacity:.5;pointer-events:none;}
 
   .hero{
     background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
@@ -115,13 +119,21 @@
     position:relative;
   }
   .gov-card:hover{border-color:var(--brand-2);transform:translateY(-2px);}
+  .gov-card .code{
+    position:absolute;top:12px;left:12px;font-family:'Cairo';font-weight:800;
+    font-size:11px;color:var(--gold);background:var(--gold-soft);
+    padding:2px 7px;border-radius:6px;
+  }
   .gov-card h3{margin:0 0 10px;font-size:16px;}
+  .gov-card .mini-bar{height:6px;border-radius:4px;background:var(--new-soft);overflow:hidden;display:flex;margin-bottom:8px;}
+  .gov-card .mini-bar span{height:100%;}
   .gov-card .foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);}
   .gov-card .foot b{color:var(--ink);font-family:'Cairo';}
 
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;}
   .ws-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
   .ws-head h2{margin:0;font-size:19px;}
+  .ws-head .sub{color:var(--ink-soft);font-size:13px;margin-top:3px;}
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
   .input, select.input{
     border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-family:'Tajawal';
@@ -135,28 +147,101 @@
   thead th{
     text-align:right;color:var(--ink-soft);font-weight:700;font-size:12px;
     padding:9px 10px;border-bottom:2px solid var(--line);white-space:nowrap;
+    cursor:pointer;user-select:none;
   }
+  thead th:hover{color:var(--brand);}
   tbody td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle;}
   tbody tr:hover{background:#FAFBFD;}
   .nm{font-weight:700;}
   .muted{color:var(--ink-soft);font-size:12px;}
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;
+    font-size:11.5px;font-weight:700;white-space:nowrap;
+  }
+  .badge.new{background:var(--new-soft);color:var(--new);}
+  .badge.interested{background:var(--ok-soft);color:var(--ok);}
+  .badge.not_interested{background:var(--bad-soft);color:var(--bad);}
+  .badge.no_answer{background:var(--wait-soft);color:var(--wait);}
+  .badge.done{background:var(--ok-soft);color:var(--ok);}
+  .badge.pending{background:var(--new-soft);color:var(--new);}
   .status-select{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:'Tajawal';font-size:12.3px;background:#fff;min-width:132px;}
+  .row-actions{display:flex;gap:6px;}
+  .icon-btn{
+    border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:30px;
+    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);
+  }
+  .icon-btn:hover{border-color:var(--brand-2);color:var(--brand-2);}
+  .manual-tag{font-size:10px;background:var(--gold-soft);color:var(--gold);padding:2px 6px;border-radius:6px;margin-right:5px;}
   .empty-state{padding:40px 10px;text-align:center;color:var(--ink-soft);}
   .pagination{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:14px;font-size:13px;}
+  .checkbox-col{width:32px;text-align:center;}
+  .checkbox-col input[type="checkbox"]{width:16px;height:16px;accent-color:var(--brand-2);cursor:pointer;}
 
+  /* modal */
   .overlay{
     position:fixed;inset:0;background:rgba(18,37,64,.45);display:none;
     align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:50;
   }
   .overlay.open{display:flex;}
-  .modal{background:#fff;border-radius:16px;max-width:560px;width:100%;padding:22px;box-shadow:0 24px 60px -20px rgba(0,0,0,.4);}
+  .modal{background:#fff;border-radius:16px;max-width:620px;width:100%;padding:22px;box-shadow:0 24px 60px -20px rgba(0,0,0,.4);}
   .modal h3{margin:0 0 14px;font-size:17px;}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;}
   .form-grid .full{grid-column:1/-1;}
   .field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;font-weight:700;}
   .field .input, .field select, .field textarea{width:100%;}
   .field textarea{resize:vertical;min-height:60px;font-family:'Tajawal';border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13.5px;}
-  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap;}
+  .modal-section{font-family:'Cairo';font-weight:800;font-size:12.5px;color:var(--brand-2);margin:16px 0 8px;padding-top:12px;border-top:1px dashed var(--line);grid-column:1/-1;}
+  .modal-section:first-of-type{margin-top:0;padding-top:0;border-top:none;}
+  .skills-grid{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .skills-grid label{display:flex;align-items:center;gap:7px;font-size:12.8px;font-weight:400;color:var(--ink);cursor:pointer;}
+  .skills-grid input[type=checkbox]{width:15px;height:15px;accent-color:var(--brand-2);cursor:pointer;}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab-btn{border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-family:'Cairo';font-weight:700;font-size:13px;padding:9px 18px;border-radius:10px;cursor:pointer;}
+  .tab-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+
+  /* reports */
+  .report-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;}
+  .report-card h3{margin:0 0 12px;font-size:14.5px;}
+  .dist-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.8px;}
+  .dist-row .lbl{width:170px;flex-shrink:0;color:var(--ink-soft);}
+  .dist-row .track{flex:1;height:10px;border-radius:5px;background:var(--new-soft);overflow:hidden;}
+  .dist-row .track span{display:block;height:100%;background:var(--brand-2);}
+  .dist-row .val{width:46px;text-align:left;font-weight:700;font-family:'Cairo';}
+  .rank-list{display:flex;flex-direction:column;gap:6px;}
+  .rank-item{display:flex;justify-content:space-between;font-size:12.8px;padding:7px 10px;background:var(--paper);border-radius:8px;}
+  .rank-item b{font-family:'Cairo';color:var(--brand-2);}
+  .dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow);}
+  .kpi .n{font-family:'Cairo';font-weight:800;font-size:26px;}
+  .kpi .l{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+  .bar-track{background:var(--new-soft);border-radius:5px;height:9px;overflow:hidden;display:flex;min-width:120px;}
+  .bar-track span{height:100%;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-bottom:10px;}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:5px;position:relative;top:1px;}
+  .auto-note{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
+  .pulse{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%{opacity:1;}50%{opacity:.3;}100%{opacity:1;}}
+  .back-link{background:none;border:none;color:var(--brand-2);font-family:'Tajawal';font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;margin-bottom:14px;}
+  .back-link:hover{text-decoration:underline;}
+
+  /* login */
+  .login-wrap{min-height:90vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:34px 30px;max-width:400px;width:100%;position:relative;overflow:hidden;}
+  .login-card::before{content:"";position:absolute;top:0;right:0;left:0;height:5px;background:linear-gradient(90deg,var(--brand),var(--gold));}
+  .login-card .grid-badge{width:46px;height:46px;background:var(--brand);color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Cairo';font-weight:800;margin-bottom:14px;}
+  .login-card h2{margin:0 0 4px;font-size:19px;}
+  .login-card p{margin:0 0 20px;color:var(--ink-soft);font-size:13px;}
+  .login-card .field{margin-bottom:12px;}
+  .login-card .err{color:var(--bad);font-size:12.5px;margin-bottom:10px;min-height:16px;}
+  .login-hint{margin-top:16px;font-size:11.5px;color:var(--ink-soft);background:var(--paper);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;line-height:1.8;}
+
+  /* user management */
+  .um-table th,.um-table td{font-size:12.6px;}
+  .um-row-input{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-family:'Tajawal';font-size:12.6px;}
+  .role-pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--gold-soft);color:var(--gold);}
 
   .toast{
     position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -167,16 +252,23 @@
   .toast.ok{background:#0E4C36;}
   .toast.err{background:#5C1F16;}
 
+  .loading-spinner{display:flex;justify-content:center;padding:40px;color:var(--ink-soft);font-size:16px;}
+  .loading-spinner::after{content:"...";animation:dots 1.2s steps(4) infinite;}
+  @keyframes dots{0%{content:"";}25%{content:".";}50%{content:"..";}75%{content:"...";}}
+
   @media(max-width:720px){
     .form-grid{grid-template-columns:1fr;}
+    .dash-grid{grid-template-columns:repeat(2,1fr);}
     .topbar{flex-direction:column;align-items:flex-start;gap:12px;}
+    .skills-grid{grid-template-columns:1fr;}
+    .dist-row .lbl{width:120px;}
   }
 </style>
 </head>
 <body>
 
 <div class="app" id="app">
-  <div class="empty-state">جارِ الاتصال بقاعدة البيانات الحية...</div>
+  <div class="loading-spinner">جارِ تحميل البيانات</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -186,118 +278,280 @@
 </div>
 
 <script>
-/* ============ 1. تهيئة الاتصال بـ SUPABASE ============ */
+/* ============ 1. Supabase Configuration ============ */
 const SUPABASE_URL = 'https://rbtnwqdwccvuxhyxwszp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidG53cWR3Y2N2dXhoeXh3c3pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NjI2MzYsImV4cCI6MjEwMzQzODYzNn0.UmUaEbtpFusODGF8dsheYUKjRQN36XeWiC3mxD_AxK8';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ============ 2. حالة التطبيق والحالات ============ */
-const STATUS_MAP = {
-  'جديد': { label: 'لم يتم التواصل', class: 'new' },
-  'مهتم': { label: 'يرغب فى العمل', class: 'ok' },
-  'غير مهتم': { label: 'لا يرغب فى العمل', class: 'bad' },
-  'لا يرد': { label: 'لم يتم الرد', class: 'wait' }
+/* ============ 2. Status Configuration ============ */
+const STATUS = {
+  new: { label: 'لم يتم التواصل بعد', color: 'var(--new)', dbValue: 'جديد' },
+  interested: { label: 'يرغب فى العمل', color: 'var(--ok)', dbValue: 'مهتم' },
+  not_interested: { label: 'لا يرغب فى العمل', color: 'var(--bad)', dbValue: 'غير مهتم' },
+  no_answer: { label: 'لم يتم الرد', color: 'var(--wait)', dbValue: 'لا يرد' }
+};
+const STATUS_ORDER = ['new', 'interested', 'not_interested', 'no_answer'];
+const STATUS_DB_TO_KEY = {
+  'جديد': 'new',
+  'مهتم': 'interested',
+  'غير مهتم': 'not_interested',
+  'لا يرد': 'no_answer'
+};
+const STATUS_KEY_TO_DB = {
+  'new': 'جديد',
+  'interested': 'مهتم',
+  'not_interested': 'غير مهتم',
+  'no_answer': 'لا يرد'
 };
 
+const SKILLS_LIST = [
+  'المساحة الأرضية',
+  'نظم المعلومات الجغرافية (GIS)',
+  'استخدام الأجهزة اللوحية / GPS',
+  'إدخال البيانات (Data Entry)',
+  'التصوير الجوى / الطائرات المسيرة',
+  'التحليل الإحصائى للبيانات',
+  'أعمال الحصر الميدانى والتعداد السكانى',
+  'اللغة الإنجليزية',
+  'مهارات الحاسب الآلى (Office)',
+  'القيادة وإدارة الفرق'
+];
+const YESNO = ['نعم', 'لا'];
+
+/* ============ 3. Application State ============ */
 let allApplicants = [];
-let currentGov = null; // null = الرئيسية (كل المحافظات)
+let currentUser = null; // { id, username, role: 'admin'|'gov', governorate }
+let currentGov = null; // null = landing page
 let searchTerm = '';
 let statusFilter = 'all';
 let districtFilter = 'all';
+let interviewFilter = 'all';
 let page = 1;
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 40;
+let dashTab = 'follow';
+let dashInterval = null;
 
-/* ============ 3. أدوات مساعدة ============ */
-function toast(msg, kind){
+/* ============ 4. Helper Functions ============ */
+function toast(msg, kind) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast show ' + (kind||'');
+  t.className = 'toast show ' + (kind || '');
   clearTimeout(t._h);
-  t._h = setTimeout(()=>{ t.className='toast'; }, 2600);
+  t._h = setTimeout(() => { t.className = 'toast'; }, 2600);
 }
 
-function esc(s){
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-/* ============ 4. جلب وتحديث البيانات مع Supabase ============ */
+function uid() { return 'a' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); }
+
+function formatDate(d) {
+  if (!d) return '-';
+  try { return new Date(d).toLocaleDateString('ar-EG'); } catch (e) { return d; }
+}
+
+function statusFromDB(dbVal) {
+  const key = STATUS_DB_TO_KEY[dbVal] || 'new';
+  return key;
+}
+
+function statusToDB(key) {
+  return STATUS_KEY_TO_DB[key] || 'جديد';
+}
+
+function govNameFromCode(code) {
+  const map = {
+    '1': 'القاهرة', '2': 'الاسكندرية', '3': 'بورسعيد', '4': 'السويس',
+    '11': 'دمياط', '12': 'الدقهلية', '13': 'الشرقية', '14': 'القليوبية',
+    '15': 'كفر الشيخ', '16': 'الغربية', '17': 'المنوفية', '18': 'البحيرة',
+    '19': 'الاسماعيلية', '21': 'الجيزة', '22': 'بنى سويف', '23': 'الفيوم',
+    '24': 'المنيا', '25': 'أسيوط', '26': 'سوهاج', '27': 'قنا',
+    '28': 'أسوان', '29': 'الأقصر', '31': 'البحر الأحمر', '32': 'الوادى الجديد',
+    '33': 'مطروح', '34': 'شمال سيناء', '35': 'جنوب سيناء'
+  };
+  return map[String(code)] || code;
+}
+
+/* ============ 5. Supabase Data Operations ============ */
 async function fetchApplicants() {
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from('applicants')
       .select('*')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
     allApplicants = data || [];
-    render();
+    return allApplicants;
   } catch (err) {
-    console.error('خطأ في جلب البيانات:', err.message);
+    console.error('Error fetching applicants:', err.message);
     toast('تعذر جلب البيانات من السيرفر', 'err');
-  }
-}
-
-async function updateStatus(id, newStatus) {
-  try {
-    const { error } = await supabaseClient
-      .from('applicants')
-      .update({ status: newStatus })
-      .eq('id', id);
-
-    if (error) throw error;
-    
-    toast('تم تحديث حالة المتقدم بنجاح', 'ok');
-    const item = allApplicants.find(a => a.id === id);
-    if(item) item.status = newStatus;
-    render();
-  } catch (err) {
-    toast('حدث خطأ أثناء التحديث', 'err');
+    return [];
   }
 }
 
 async function saveApplicant(formData) {
   try {
-    let res;
-    if (formData.id) {
-      res = await supabaseClient.from('applicants').update(formData).eq('id', formData.id);
-    } else {
-      res = await supabaseClient.from('applicants').insert([formData]);
+    const payload = { ...formData };
+    // Handle boolean fields
+    if (payload.interview_done === 'true') payload.interview_done = true;
+    else if (payload.interview_done === 'false') payload.interview_done = false;
+    if (payload.manual === 'true') payload.manual = true;
+    else if (payload.manual === 'false') payload.manual = false;
+
+    // Handle skills array
+    if (payload.skills && typeof payload.skills === 'string') {
+      try { payload.skills = JSON.parse(payload.skills); } catch (e) { payload.skills = []; }
     }
-    
-    if (res.error) throw res.error;
-    
-    toast(formData.id ? 'تم تعديل البيانات بنجاح' : 'تمت إضافة المتقدم بنجاح', 'ok');
-    closeModal();
-    fetchApplicants();
+    if (!payload.skills) payload.skills = [];
+
+    let result;
+    if (payload.id) {
+      result = await supabase.from('applicants').update(payload).eq('id', payload.id);
+    } else {
+      delete payload.id;
+      result = await supabase.from('applicants').insert([payload]);
+    }
+
+    if (result.error) throw result.error;
+    toast(formData.id ? 'تم تحديث البيانات' : 'تمت إضافة المتقدم', 'ok');
+    await fetchApplicants();
+    render();
   } catch (err) {
-    toast('خطأ في حفظ البيانات: ' + err.message, 'err');
+    toast('خطأ في الحفظ: ' + err.message, 'err');
   }
 }
 
-/* ============ 5. عرض الواجهة الرئيسي ============ */
+async function deleteApplicant(id) {
+  if (!confirm('هل أنت متأكد من حذف هذا المتقدم؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+  try {
+    const { error } = await supabase.from('applicants').delete().eq('id', id);
+    if (error) throw error;
+    toast('تم حذف المتقدم', 'ok');
+    await fetchApplicants();
+    render();
+  } catch (err) {
+    toast('خطأ في الحذف: ' + err.message, 'err');
+  }
+}
+
+/* ============ 6. Authentication ============ */
+const USERS_TABLE = 'users';
+let usersCache = null;
+
+async function loadUsers() {
+  try {
+    const { data, error } = await supabase.from(USERS_TABLE).select('*');
+    if (error) throw error;
+    usersCache = data || [];
+    return usersCache;
+  } catch (err) {
+    console.error('Error loading users:', err.message);
+    // Seed default admin if no users exist
+    if (usersCache === null || usersCache.length === 0) {
+      usersCache = [{ id: uid(), username: 'admin', password: 'admin123', role: 'admin', governorate: null }];
+      await supabase.from(USERS_TABLE).insert(usersCache);
+    }
+    return usersCache;
+  }
+}
+
+async function attemptLogin(username, password) {
+  await loadUsers();
+  const user = usersCache.find(u => u.username === username && u.password === password);
+  if (!user) { loginError = 'اسم المستخدم أو كلمة المرور غير صحيحة'; return false; }
+  currentUser = { id: user.id, username: user.username, role: user.role, governorate: user.governorate };
+  loginError = '';
+  return true;
+}
+
+function logout() {
+  currentUser = null;
+  currentGov = null;
+  if (dashInterval) clearInterval(dashInterval);
+  render();
+}
+
+let loginError = '';
+
+/* ============ 7. Rendering ============ */
 function render() {
-  const app = document.getElementById('app');
-  if (!currentGov) {
-    app.innerHTML = renderLanding();
-    bindLanding();
-  } else {
-    app.innerHTML = renderWorkspace();
-    bindWorkspace();
+  if (!currentUser) {
+    renderLogin();
+    return;
   }
+  if (currentUser.role === 'gov' && !currentGov) {
+    // Auto-open governorate for gov users
+    const found = allApplicants.some(a => a.governorate === currentUser.governorate);
+    currentGov = currentUser.governorate || null;
+    if (!currentGov) {
+      // If gov user has no governorate assigned, show landing
+      renderLanding();
+      return;
+    }
+    renderWorkspace();
+    return;
+  }
+  if (!currentGov || currentGov === '__dashboard__' || currentGov === '__users__') {
+    const app = document.getElementById('app');
+    if (currentGov === '__dashboard__') {
+      renderDashboard();
+    } else if (currentGov === '__users__') {
+      renderUserManagement();
+    } else {
+      renderLanding();
+    }
+    return;
+  }
+  renderWorkspace();
 }
 
+function renderLogin() {
+  document.getElementById('app').innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="grid-badge">GIS</div>
+        <h2>منصة متابعة متقدمي مشروع الحصر الخرائطي</h2>
+        <p>سجّل الدخول بحساب مسؤول المحافظة أو حساب المشرف العام</p>
+        <div class="err">${esc(loginError)}</div>
+        <div class="field"><input class="input" id="loginUser" placeholder="اسم المستخدم" style="width:100%;"></div>
+        <div class="field"><input class="input" id="loginPass" type="password" placeholder="كلمة المرور" style="width:100%;"></div>
+        <button class="btn btn-primary" id="btnLogin" style="width:100%;justify-content:center;">تسجيل الدخول</button>
+        <div class="login-hint">الحساب الافتراضي: <b>admin</b> / <b>admin123</b> — يوصى بتغيير كلمة المرور فور الدخول.</div>
+      </div>
+    </div>
+  `;
+  const doLogin = async () => {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value;
+    if (!u || !p) { loginError = 'يرجى إدخال اسم المستخدم وكلمة المرور'; renderLogin(); return; }
+    document.getElementById('btnLogin').textContent = 'جارِ التحقق...';
+    const ok = await attemptLogin(u, p);
+    if (ok) { await fetchApplicants(); render(); } else renderLogin();
+  };
+  document.getElementById('btnLogin').onclick = doLogin;
+  document.getElementById('loginPass').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+  document.getElementById('loginUser').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+}
+
+/* ============ 8. Landing Page ============ */
 function renderLanding() {
-  // تجميع الإحصائيات حسب المحافظات
   const govsMap = {};
   allApplicants.forEach(a => {
     const g = a.governorate || 'غير محدد';
-    if (!govsMap[g]) govsMap[g] = { name: g, count: 0, interested: 0 };
+    if (!govsMap[g]) govsMap[g] = { name: g, count: 0, interested: 0, code: a.gov_code || '' };
     govsMap[g].count++;
     if (a.status === 'مهتم') govsMap[g].interested++;
   });
+  const govs = Object.values(govsMap).sort((a, b) => a.name.localeCompare(b.name, 'ar'));
 
-  const govs = Object.values(govsMap);
+  const totals = {
+    total: allApplicants.length,
+    interested: allApplicants.filter(a => a.status === 'مهتم').length,
+    not_interested: allApplicants.filter(a => a.status === 'غير مهتم').length,
+    no_answer: allApplicants.filter(a => a.status === 'لا يرد' || a.status === 'جديد').length
+  };
 
   return `
     <div class="topbar">
@@ -305,66 +559,74 @@ function renderLanding() {
         <div class="grid-badge">GIS</div>
         <div>
           <h1>منصة متابعة متقدمي مشروع الحصر الخرائطي</h1>
-          <div class="sub">إدارة وتوزيع بيانات المتقدمين على مستوى المحافظات (متصل بسحابة حية)</div>
+          <div class="sub">إدارة بيانات المتقدمين ونتائج التواصل — ${esc(currentUser.username)} (${currentUser.role === 'admin' ? 'مشرف عام' : 'مسؤول محافظة'})</div>
         </div>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-primary" onclick="openApplicantModal()">+ إضافة متقدم جديد</button>
-        <button class="btn btn-ghost" onclick="exportToExcel()">⬇ تصدير الكل Excel</button>
+        ${currentUser.role === 'admin' ? `<button class="btn btn-primary" id="btnDash">لوحة المتابعة العامة</button>` : ''}
+        ${currentUser.role === 'admin' ? `<button class="btn btn-ghost" id="btnUsers">إدارة المستخدمين</button>` : ''}
+        <button class="btn btn-ghost" id="btnExportAll">⬇ تصدير الكل Excel</button>
+        <button class="btn btn-ghost" id="btnLogout">خروج</button>
       </div>
     </div>
 
     <div class="hero">
-      <h2>مرحباً بك في لوحة التحكم المركزية</h2>
-      <p>يمكنك التوافق ومتابعة المتقدمين في كل محافظة والتواصل معهم لتسجيل رغبتهم الميدانية.</p>
+      <h2>اختر المحافظة للمتابعة</h2>
+      <p>يمكنك عرض بيانات المتقدمين لكل محافظة، تحديث حالات التواصل، إضافة متقدمين جدد، وتحرير البيانات.</p>
       <div class="stat-row">
-        <div class="stat-chip new"><div class="n">${allApplicants.length}</div><div class="l">إجمالي المتقدمين</div></div>
-        <div class="stat-chip ok"><div class="n">${allApplicants.filter(a=>a.status==='مهتم').length}</div><div class="l">راغبو العمل</div></div>
-        <div class="stat-chip bad"><div class="n">${allApplicants.filter(a=>a.status==='غير مهتم').length}</div><div class="l">غير راغبين</div></div>
-        <div class="stat-chip wait"><div class="n">${allApplicants.filter(a=>a.status==='لا يرد' || a.status==='جديد').length}</div><div class="l">قيد المتابعة</div></div>
+        <div class="stat-chip new"><div class="n">${totals.total}</div><div class="l">إجمالي المتقدمين</div></div>
+        <div class="stat-chip ok"><div class="n">${totals.interested}</div><div class="l">راغبو العمل</div></div>
+        <div class="stat-chip bad"><div class="n">${totals.not_interested}</div><div class="l">غير راغبين</div></div>
+        <div class="stat-chip wait"><div class="n">${totals.no_answer}</div><div class="l">قيد المتابعة</div></div>
       </div>
     </div>
 
-    <h3 style="margin-bottom:12px;">اختر المحافظة للعرض والتعديل:</h3>
     <div class="gov-grid">
       ${govs.length ? govs.map(g => `
-        <div class="gov-card" data-slug="${esc(g.name)}">
+        <div class="gov-card" data-gov="${esc(g.name)}">
+          <div class="code">${esc(g.code)}</div>
           <h3>${esc(g.name)}</h3>
-          <div class="foot">
-            <span>إجمالي المتقدمين: <b>${g.count}</b></span>
-            <span>الراغبون: <b style="color:var(--ok);">${g.interested}</b></span>
+          <div class="mini-bar">
+            <span style="width:${g.count > 0 ? (g.interested / g.count * 100) : 0}%;background:var(--ok)"></span>
           </div>
+          <div class="foot"><span>إجمالي: <b>${g.count}</b></span><span>راغبون: <b style="color:var(--ok);">${g.interested}</b></span></div>
         </div>
-      `).join('') : '<div class="empty-state">لا توجد بيانات متاحة حالياً، قم بإضافة متقدم جديد.</div>'}
+      `).join('') : '<div class="empty-state">لا توجد بيانات متاحة</div>'}
     </div>
   `;
 }
 
 function bindLanding() {
+  document.getElementById('btnDash')?.addEventListener('click', () => { currentGov = '__dashboard__'; render(); });
+  document.getElementById('btnUsers')?.addEventListener('click', () => { currentGov = '__users__'; render(); });
+  document.getElementById('btnExportAll')?.addEventListener('click', exportAllToExcel);
+  document.getElementById('btnLogout')?.addEventListener('click', logout);
   document.querySelectorAll('.gov-card').forEach(el => {
     el.onclick = () => {
-      currentGov = el.dataset.slug;
+      currentGov = el.dataset.gov;
       page = 1;
       render();
     };
   });
 }
 
+/* ============ 9. Workspace (Governorate View) ============ */
 function renderWorkspace() {
   let list = allApplicants.filter(a => a.governorate === currentGov);
-  
-  // الأحياء التابعة للمحافظة
+
   const districts = Array.from(new Set(list.map(a => a.district).filter(Boolean)));
 
-  // الفلترة
   list = list.filter(a => {
     if (statusFilter !== 'all' && a.status !== statusFilter) return false;
     if (districtFilter !== 'all' && a.district !== districtFilter) return false;
+    if (interviewFilter === 'done' && !a.interview_done) return false;
+    if (interviewFilter === 'pending' && a.interview_done) return false;
     if (searchTerm) {
       const s = searchTerm.trim().toLowerCase();
       return (a.full_name || '').toLowerCase().includes(s) ||
              (a.national_id || '').includes(s) ||
-             (a.phone || '').includes(s);
+             (a.phone || '').includes(s) ||
+             (a.phone2 || '').includes(s);
     }
     return true;
   });
@@ -373,37 +635,56 @@ function renderWorkspace() {
   if (page > totalPages) page = totalPages;
   const pageItems = list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  const c = { new: 0, interested: 0, not_interested: 0, no_answer: 0 };
+  list.forEach(a => {
+    const key = statusFromDB(a.status);
+    if (c[key] !== undefined) c[key]++;
+  });
+  const interviewedCount = list.filter(a => a.interview_done).length;
+
   return `
     <div class="topbar">
       <div class="title">
         <div class="grid-badge">GIS</div>
         <div>
-          <h1>محافظة: ${esc(currentGov)}</h1>
-          <div class="sub">إدارة قوائم المتقدمين وتحديث حالات التواصل الحية</div>
+          <h1>محافظة ${esc(currentGov)}</h1>
+          <div class="sub">متابعة نتائج التواصل مع المتقدمين</div>
         </div>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" onclick="currentGov=null;render();">↩ العودة للمحافظات</button>
-        <button class="btn btn-primary" onclick="openApplicantModal('${esc(currentGov)}')">+ إضافة متقدم بالمحافظة</button>
-        <button class="btn btn-ghost" onclick="exportToExcel('${esc(currentGov)}')">⬇ تصدير Excel</button>
+        <button class="btn btn-ghost" id="btnBack">↩ ${currentUser.role === 'admin' ? 'قائمة المحافظات' : 'خروج'}</button>
+        <button class="btn btn-primary" id="btnAdd">+ إضافة متقدم</button>
+        <button class="btn btn-ghost" id="btnExportGov">⬇ تصدير Excel</button>
+        ${currentUser.role === 'admin' ? `<button class="btn btn-ghost" id="btnDashSmall">📊 لوحة المتابعة</button>` : ''}
       </div>
     </div>
 
     <div class="panel">
+      <div class="stat-row">
+        <div class="stat-chip new"><div class="n">${c.new}</div><div class="l">${STATUS.new.label}</div></div>
+        <div class="stat-chip ok"><div class="n">${c.interested}</div><div class="l">${STATUS.interested.label}</div></div>
+        <div class="stat-chip bad"><div class="n">${c.not_interested}</div><div class="l">${STATUS.not_interested.label}</div></div>
+        <div class="stat-chip wait"><div class="n">${c.no_answer}</div><div class="l">${STATUS.no_answer.label}</div></div>
+        <div class="stat-chip ok"><div class="n">${interviewedCount}</div><div class="l">تمت مقابلتهم من ${list.length}</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ws-head"><h2>قائمة المتقدمين (${list.length})</h2></div>
       <div class="toolbar">
-        <div class="search-wrap">
-          <input class="input" id="searchBox" placeholder="بحث بالاسم / الرقم القومي / الهاتف..." value="${esc(searchTerm)}">
-        </div>
+        <div class="search-wrap"><input class="input" id="searchBox" placeholder="بحث بالاسم / الرقم القومى / الهاتف" value="${esc(searchTerm)}"></div>
         <select class="input" id="statusFilterSel">
-          <option value="all">كل حالات التواصل</option>
-          <option value="جديد" ${statusFilter==='جديد'?'selected':''}>جديد (لم يتم التواصل)</option>
-          <option value="مهتم" ${statusFilter==='مهتم'?'selected':''}>مهتم (يرغب بالعمل)</option>
-          <option value="غير مهتم" ${statusFilter==='غير مهتم'?'selected':''}>غير مهتم</option>
-          <option value="لا يرد" ${statusFilter==='لا يرد'?'selected':''}>لا يرد</option>
+          <option value="all">كل الحالات</option>
+          ${STATUS_ORDER.map(k => `<option value="${statusToDB(k)}" ${statusFilter === statusToDB(k) ? 'selected' : ''}>${STATUS[k].label}</option>`).join('')}
         </select>
         <select class="input" id="districtFilterSel">
-          <option value="all">كل الأحياء / المراكز</option>
-          ${districts.map(d=>`<option value="${esc(d)}" ${districtFilter===d?'selected':''}>${esc(d)}</option>`).join('')}
+          <option value="all">كل الأقسام/المراكز</option>
+          ${districts.map(d => `<option value="${esc(d)}" ${districtFilter === d ? 'selected' : ''}>${esc(d)}</option>`).join('')}
+        </select>
+        <select class="input" id="interviewFilterSel">
+          <option value="all" ${interviewFilter === 'all' ? 'selected' : ''}>كل حالات المقابلة</option>
+          <option value="done" ${interviewFilter === 'done' ? 'selected' : ''}>تمت المقابلة</option>
+          <option value="pending" ${interviewFilter === 'pending' ? 'selected' : ''}>لم تتم المقابلة</option>
         </select>
       </div>
 
@@ -412,126 +693,228 @@ function renderWorkspace() {
         <table>
           <thead>
             <tr>
-              <th>الاسم الكامل</th>
-              <th>الرقم القومي</th>
+              <th>الاسم</th>
+              <th>الرقم القومى</th>
               <th>الهاتف</th>
-              <th>المركز / الحي</th>
-              <th>المؤهل الدراسي</th>
+              <th>القسم / المركز</th>
+              <th>المؤهل</th>
               <th>حالة التواصل</th>
-              <th>ملاحظات</th>
-              <th>إجراءات</th>
+              <th>المقابلة</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             ${pageItems.map(a => `
-              <tr>
-                <td><span class="nm">${esc(a.full_name)}</span></td>
+              <tr data-id="${a.id}">
+                <td><span class="nm">${esc(a.full_name)}</span>${a.manual ? '<span class="manual-tag">مضاف يدوياً</span>' : ''}</td>
                 <td class="muted">${esc(a.national_id)}</td>
-                <td class="muted">${esc(a.phone)}</td>
+                <td class="muted">${esc(a.phone)}${a.phone2 ? ' / ' + esc(a.phone2) : ''}</td>
                 <td class="muted">${esc(a.district || '-')}</td>
                 <td class="muted">${esc(a.qualification)}</td>
                 <td>
-                  <select class="status-select" onchange="updateStatus(${a.id}, this.value)">
-                    <option value="جديد" ${a.status==='جديد'?'selected':''}>جديد</option>
-                    <option value="مهتم" ${a.status==='مهتم'?'selected':''}>مهتم (راغب)</option>
-                    <option value="غير مهتم" ${a.status==='غير مهتم'?'selected':''}>غير مهتم</option>
-                    <option value="لا يرد" ${a.status==='لا يرد'?'selected':''}>لا يرد</option>
+                  <select class="status-select" data-id="${a.id}">
+                    ${STATUS_ORDER.map(k => `<option value="${statusToDB(k)}" ${a.status === statusToDB(k) ? 'selected' : ''}>${STATUS[k].label}</option>`).join('')}
                   </select>
                 </td>
-                <td class="muted">${esc(a.notes || '-')}</td>
+                <td><span class="badge ${a.interview_done ? 'done' : 'pending'}">${a.interview_done ? 'منجزة' : 'لم تتم'}</span></td>
                 <td>
-                  <button class="btn btn-outline btn-sm" onclick='editApplicant(${JSON.stringify(a)})'>✎ تعديل</button>
+                  <div class="row-actions">
+                    <button class="icon-btn" data-edit="${a.id}" title="تعديل">✎</button>
+                  </div>
                 </td>
               </tr>
             `).join('')}
           </tbody>
         </table>
         </div>
-
         <div class="pagination">
-          <button class="btn btn-outline btn-sm" ${page <= 1 ? 'disabled' : ''} onclick="page--;render();">السابق</button>
+          <button class="btn btn-outline btn-sm" id="prevPage" ${page <= 1 ? 'disabled' : ''}>السابق</button>
           <span>صفحة ${page} من ${totalPages}</span>
-          <button class="btn btn-outline btn-sm" ${page >= totalPages ? 'disabled' : ''} onclick="page++;render();">التالي</button>
+          <button class="btn btn-outline btn-sm" id="nextPage" ${page >= totalPages ? 'disabled' : ''}>التالي</button>
         </div>
-      ` : '<div class="empty-state">لا توجد نتائج تطابق خيارات البحث الحالية.</div>'}
+      ` : '<div class="empty-state">لا توجد نتائج مطابقة</div>'}
     </div>
   `;
 }
 
 function bindWorkspace() {
-  const sb = document.getElementById('searchBox');
-  if (sb) {
-    sb.oninput = (e) => { searchTerm = e.target.value; page = 1; render(); };
-  }
-  const sf = document.getElementById('statusFilterSel');
-  if (sf) {
-    sf.onchange = (e) => { statusFilter = e.target.value; page = 1; render(); };
-  }
-  const df = document.getElementById('districtFilterSel');
-  if (df) {
-    df.onchange = (e) => { districtFilter = e.target.value; page = 1; render(); };
-  }
-}
-
-/* ============ 6. إدارة النوافذ المنبثقة (Modal) ============ */
-function openApplicantModal(gov = '') {
-  const m = document.getElementById('modalBox');
-  m.innerHTML = `
-    <h3>إضافة متقدم جديد</h3>
-    <form id="appForm">
-      <div class="form-grid">
-        <div class="field full"><label>الاسم الرباعي</label><input class="input" name="full_name" required></div>
-        <div class="field"><label>الرقم القومي (14 رقم)</label><input class="input" name="national_id" required maxLength="14"></div>
-        <div class="field"><label>رقم الهاتف</label><input class="input" name="phone" required></div>
-        <div class="field"><label>المحافظة</label><input class="input" name="governorate" value="${esc(gov)}" required></div>
-        <div class="field"><label>المركز / الحي</label><input class="input" name="district" required></div>
-        <div class="field full"><label>المؤهل الدراسي</label><input class="input" name="qualification" placeholder="مثال: ليسانس آداب جغرافيا / بكالوريوس هندسة" required></div>
-        <div class="field full"><label>ملاحظات التقييم / التواصل</label><textarea name="notes"></textarea></div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button>
-        <button type="submit" class="btn btn-primary">حفظ في قاعدة البيانات</button>
-      </div>
-    </form>
-  `;
-  document.getElementById('overlay').classList.add('open');
-  
-  document.getElementById('appForm').onsubmit = (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const data = Object.fromEntries(fd.entries());
-    saveApplicant(data);
+  document.getElementById('btnBack').onclick = () => {
+    if (currentUser.role === 'admin') { currentGov = null; render(); } else { logout(); }
   };
+  document.getElementById('btnAdd').onclick = () => openApplicantModal(null);
+  document.getElementById('btnExportGov').onclick = () => exportGovToExcel(currentGov);
+  document.getElementById('btnDashSmall')?.addEventListener('click', () => { currentGov = '__dashboard__'; render(); });
+
+  const sb = document.getElementById('searchBox');
+  if (sb) sb.oninput = (e) => { searchTerm = e.target.value; page = 1; render(); };
+  const sf = document.getElementById('statusFilterSel');
+  if (sf) sf.onchange = (e) => { statusFilter = e.target.value; page = 1; render(); };
+  const df = document.getElementById('districtFilterSel');
+  if (df) df.onchange = (e) => { districtFilter = e.target.value; page = 1; render(); };
+  const ifs = document.getElementById('interviewFilterSel');
+  if (ifs) ifs.onchange = (e) => { interviewFilter = e.target.value; page = 1; render(); };
+
+  document.getElementById('prevPage')?.addEventListener('click', () => { page--; render(); });
+  document.getElementById('nextPage')?.addEventListener('click', () => { page++; render(); });
+
+  document.querySelectorAll('.status-select').forEach(sel => {
+    sel.onchange = async (e) => {
+      const id = e.target.dataset.id;
+      const newStatus = e.target.value;
+      try {
+        const { error } = await supabase.from('applicants').update({ status: newStatus }).eq('id', id);
+        if (error) throw error;
+        const item = allApplicants.find(a => a.id === id);
+        if (item) item.status = newStatus;
+        toast('تم تحديث الحالة', 'ok');
+      } catch (err) {
+        toast('خطأ في التحديث: ' + err.message, 'err');
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.edit;
+      const app = allApplicants.find(a => a.id === id);
+      if (app) openApplicantModal(app);
+    };
+  });
 }
 
-function editApplicant(app) {
-  const m = document.getElementById('modalBox');
-  m.innerHTML = `
-    <h3>تعديل بيانات المتقدم</h3>
+/* ============ 10. Applicant Modal ============ */
+function yesNoOptions(val) {
+  return `<option value="">غير محدد</option>` + YESNO.map(v => `<option value="${v}" ${val === v ? 'selected' : ''}>${v}</option>`).join('');
+}
+
+function openApplicantModal(app) {
+  const isEdit = !!app;
+  const defaultGov = currentGov || '';
+  const a = isEdit ? app : {
+    id: null,
+    full_name: '',
+    national_id: '',
+    phone: '',
+    phone2: '',
+    address: '',
+    district: '',
+    governorate: defaultGov,
+    gov_code: '',
+    qualification: '',
+    gender: '',
+    college: '',
+    specialization: '',
+    grad_year: '',
+    skills: [],
+    skills_other: '',
+    can_work_outside_residence: '',
+    can_work_outside_gov: '',
+    can_work_holidays: '',
+    fully_available: '',
+    health_issue: '',
+    pref_qism1: '',
+    pref_qism2: '',
+    pref_qism3: '',
+    interview_done: false,
+    notes: '',
+    status: 'جديد'
+  };
+
+  const box = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3>${isEdit ? 'تعديل بيانات متقدم' : 'إضافة متقدم جديد'}</h3>
     <form id="appForm">
-      <input type="hidden" name="id" value="${app.id}">
+      ${isEdit ? `<input type="hidden" name="id" value="${a.id}">` : ''}
       <div class="form-grid">
-        <div class="field full"><label>الاسم الرباعي</label><input class="input" name="full_name" value="${esc(app.full_name)}" required></div>
-        <div class="field"><label>الرقم القومي</label><input class="input" name="national_id" value="${esc(app.national_id)}" required></div>
-        <div class="field"><label>رقم الهاتف</label><input class="input" name="phone" value="${esc(app.phone)}" required></div>
-        <div class="field"><label>المحافظة</label><input class="input" name="governorate" value="${esc(app.governorate)}" required></div>
-        <div class="field"><label>المركز / الحي</label><input class="input" name="district" value="${esc(app.district)}" required></div>
-        <div class="field full"><label>المؤهل الدراسي</label><input class="input" name="qualification" value="${esc(app.qualification)}" required></div>
-        <div class="field full"><label>ملاحظات</label><textarea name="notes">${esc(app.notes || '')}</textarea></div>
+        <div class="modal-section">البيانات الأساسية</div>
+        <div class="field full"><label>الاسم الرباعى *</label><input class="input" name="full_name" value="${esc(a.full_name)}" required></div>
+        <div class="field"><label>الرقم القومى (14 رقم) *</label><input class="input" name="national_id" maxlength="14" value="${esc(a.national_id)}" required></div>
+        <div class="field"><label>النوع</label>
+          <select class="input" name="gender">
+            <option value="">غير محدد</option>
+            <option value="ذكر" ${a.gender === 'ذكر' ? 'selected' : ''}>ذكر</option>
+            <option value="أنثى" ${a.gender === 'أنثى' ? 'selected' : ''}>أنثى</option>
+          </select>
+        </div>
+        <div class="field"><label>رقم الهاتف الأساسى *</label><input class="input" name="phone" value="${esc(a.phone)}" required></div>
+        <div class="field"><label>رقم هاتف بديل</label><input class="input" name="phone2" value="${esc(a.phone2)}"></div>
+        <div class="field full"><label>العنوان بالتفصيل</label><input class="input" name="address" value="${esc(a.address)}"></div>
+
+        <div class="field"><label>المحافظة *</label>
+          <select class="input" name="governorate" required>
+            ${['القاهرة','الاسكندرية','بورسعيد','السويس','دمياط','الدقهلية','الشرقية','القليوبية','كفر الشيخ','الغربية','المنوفية','البحيرة','الاسماعيلية','الجيزة','بنى سويف','الفيوم','المنيا','أسيوط','سوهاج','قنا','أسوان','الأقصر','البحر الأحمر','الوادى الجديد','مطروح','شمال سيناء','جنوب سيناء'].map(g =>
+              `<option value="${g}" ${a.governorate === g ? 'selected' : ''}>${g}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div class="field"><label>القسم أو المركز</label><input class="input" name="district" value="${esc(a.district)}"></div>
+
+        <div class="modal-section">البيانات العلمية</div>
+        <div class="field"><label>المؤهل *</label><input class="input" name="qualification" value="${esc(a.qualification)}" required></div>
+        <div class="field"><label>سنة التخرج</label><input class="input" name="grad_year" value="${esc(a.grad_year)}" placeholder="مثال: 2022"></div>
+        <div class="field"><label>الكلية أو المعهد</label><input class="input" name="college" value="${esc(a.college)}"></div>
+        <div class="field"><label>التخصص بالتفصيل</label><input class="input" name="specialization" value="${esc(a.specialization)}"></div>
+
+        <div class="field full"><label>المهارات</label>
+          <div class="skills-grid">
+            ${SKILLS_LIST.map(s => `
+              <label><input type="checkbox" name="skills" value="${esc(s)}" ${(a.skills || []).includes(s) ? 'checked' : ''}> ${esc(s)}</label>
+            `).join('')}
+          </div>
+        </div>
+        <div class="field full"><label>مهارات أخرى</label><input class="input" name="skills_other" value="${esc(a.skills_other)}"></div>
+
+        <div class="modal-section">بيانات المقابلة الميدانية</div>
+        <div class="field"><label>العمل خارج محل الإقامة؟</label><select class="input" name="can_work_outside_residence">${yesNoOptions(a.can_work_outside_residence)}</select></div>
+        <div class="field"><label>العمل خارج المحافظة؟</label><select class="input" name="can_work_outside_gov">${yesNoOptions(a.can_work_outside_gov)}</select></div>
+        <div class="field"><label>العمل أيام العطلات؟</label><select class="input" name="can_work_holidays">${yesNoOptions(a.can_work_holidays)}</select></div>
+        <div class="field"><label>متفرغ للعمل؟</label><select class="input" name="fully_available">${yesNoOptions(a.fully_available)}</select></div>
+        <div class="field full"><label>مانع صحى للعمل الميدانى؟</label><select class="input" name="health_issue">${yesNoOptions(a.health_issue)}</select></div>
+
+        <div class="field"><label>رغبة العمل الأولى</label><input class="input" name="pref_qism1" value="${esc(a.pref_qism1)}"></div>
+        <div class="field"><label>رغبة العمل الثانية</label><input class="input" name="pref_qism2" value="${esc(a.pref_qism2)}"></div>
+        <div class="field"><label>رغبة العمل الثالثة</label><input class="input" name="pref_qism3" value="${esc(a.pref_qism3)}"></div>
+
+        <div class="modal-section">ملاحظات</div>
+        <div class="field full"><label>ملاحظات</label><textarea name="notes">${esc(a.notes || '')}</textarea></div>
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">إلغاء</button>
-        <button type="submit" class="btn btn-primary">تحديث البيانات</button>
+        ${isEdit ? `<button type="button" class="btn btn-danger-o" id="btnDelete">حذف المتقدم</button>` : ''}
+        <button type="button" class="btn btn-outline" id="btnCancel">إلغاء</button>
+        <button type="submit" class="btn btn-primary">${isEdit ? 'حفظ التعديلات' : 'إضافة المتقدم'}</button>
       </div>
     </form>
   `;
+
   document.getElementById('overlay').classList.add('open');
 
-  document.getElementById('appForm').onsubmit = (e) => {
+  document.getElementById('btnCancel').onclick = closeModal;
+
+  if (isEdit) {
+    document.getElementById('btnDelete').onclick = async () => {
+      closeModal();
+      await deleteApplicant(a.id);
+    };
+  }
+
+  document.getElementById('appForm').onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
     const data = Object.fromEntries(fd.entries());
-    saveApplicant(data);
+
+    // Handle skills as array
+    const skills = [];
+    document.querySelectorAll('input[name="skills"]:checked').forEach(cb => skills.push(cb.value));
+    data.skills = skills;
+
+    // Determine if interview was done
+    const interviewFields = ['gender', 'can_work_outside_residence', 'can_work_outside_gov', 'can_work_holidays', 'fully_available', 'health_issue'];
+    data.interview_done = interviewFields.some(f => data[f] && data[f] !== '');
+
+    // Set gov_code from governorate name
+    // We'll store it as is, or map if needed
+
+    await saveApplicant(data);
   };
 }
 
@@ -539,41 +922,405 @@ function closeModal() {
   document.getElementById('overlay').classList.remove('open');
 }
 
-/* ============ 7. تصدير البيانات إلى ملف Excel ============ */
-function exportToExcel(govFilter = null) {
-  let dataToExport = allApplicants;
-  if (govFilter) {
-    dataToExport = dataToExport.filter(a => a.governorate === govFilter);
-  }
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'overlay') closeModal();
+});
 
-  if(!dataToExport.length) {
-    toast('لا توجد بيانات لتصديرها', 'err');
+/* ============ 11. Dashboard ============ */
+async function renderDashboard() {
+  if (currentUser.role !== 'admin') {
+    toast('هذه الشاشة متاحة للمشرف العام فقط', 'err');
+    currentGov = null;
+    render();
     return;
   }
 
-  const rows = dataToExport.map(a => ({
-    'الرقم المعرف': a.id,
-    'الاسم الكامل': a.full_name,
-    'الرقم القومي': a.national_id,
-    'الهاتف': a.phone,
-    'المحافظة': a.governorate,
-    'المركز / الحي': a.district,
-    'المؤهل الدراسي': a.qualification,
-    'حالة التواصل': a.status,
-    'الملاحظات': a.notes,
-    'تاريخ التسجيل': a.created_at
-  }));
+  await fetchApplicants();
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="title">
+        <div class="grid-badge">GIS</div>
+        <div>
+          <h1>لوحة المتابعة العامة</h1>
+          <div class="sub">إجمالي نتائج التواصل مع المتقدمين على مستوى الجمهورية</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="btnBack">↩ قائمة المحافظات</button>
+        <button class="btn btn-ghost" id="btnRefreshDash">⟳ تحديث</button>
+      </div>
+    </div>
 
-  const worksheet = XLSX.utils.json_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "المتقدمين");
+    <button class="back-link" id="btnBack2">→ رجوع</button>
 
-  const fileName = govFilter ? `متقدمو_${govFilter}.xlsx` : `جميع_المتقدمين_المشروع.xlsx`;
-  XLSX.writeFile(workbook, fileName);
+    <div class="tabs">
+      <button class="tab-btn ${dashTab === 'follow' ? 'active' : ''}" id="tabFollow">لوحة المتابعة</button>
+      <button class="tab-btn ${dashTab === 'reports' ? 'active' : ''}" id="tabReports">التقارير</button>
+    </div>
+
+    <div id="dashBody"></div>
+  `;
+
+  document.getElementById('btnBack').onclick = () => { currentGov = null; render(); };
+  document.getElementById('btnBack2').onclick = () => { currentGov = null; render(); };
+  document.getElementById('btnRefreshDash').onclick = () => { renderDashboard(); };
+  document.getElementById('tabFollow').onclick = () => { dashTab = 'follow'; renderDashboard(); };
+  document.getElementById('tabReports').onclick = () => { dashTab = 'reports'; renderDashboard(); };
+
+  if (dashTab === 'follow') renderFollowTab();
+  else renderReportsTab();
 }
 
-// بدء التطبيق فور الفتح
-document.addEventListener('DOMContentLoaded', fetchApplicants);
+function renderFollowTab() {
+  const govsMap = {};
+  allApplicants.forEach(a => {
+    const g = a.governorate || 'غير محدد';
+    if (!govsMap[g]) govsMap[g] = { name: g, list: [] };
+    govsMap[g].list.push(a);
+  });
+
+  let totals = { total: 0, interested: 0, not_interested: 0, no_answer: 0, new: 0, interviewed: 0 };
+
+  const rows = Object.values(govsMap).map(g => {
+    const list = g.list;
+    const c = { new: 0, interested: 0, not_interested: 0, no_answer: 0 };
+    list.forEach(a => {
+      const key = statusFromDB(a.status);
+      if (c[key] !== undefined) c[key]++;
+    });
+    const total = list.length;
+    const interviewed = list.filter(a => a.interview_done).length;
+    totals.total += total;
+    totals.interested += c.interested;
+    totals.not_interested += c.not_interested;
+    totals.no_answer += c.no_answer;
+    totals.new += c.new;
+    totals.interviewed += interviewed;
+    return { ...g, c, total, interviewed };
+  });
+
+  totals.contacted = totals.interested + totals.not_interested + totals.no_answer;
+
+  document.getElementById('dashBody').innerHTML = `
+    <div class="dash-grid">
+      <div class="kpi"><div class="n">${totals.total}</div><div class="l">إجمالي المتقدمين</div></div>
+      <div class="kpi"><div class="n" style="color:var(--ok)">${totals.interested}</div><div class="l">${STATUS.interested.label}</div></div>
+      <div class="kpi"><div class="n" style="color:var(--bad)">${totals.not_interested}</div><div class="l">${STATUS.not_interested.label}</div></div>
+      <div class="kpi"><div class="n" style="color:var(--wait)">${totals.no_answer}</div><div class="l">${STATUS.no_answer.label}</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="ws-head">
+        <h2>نسبة الإنجاز: ${totals.total ? Math.round(totals.contacted / totals.total * 100) : 0}% تم التواصل معهم</h2>
+        <div class="auto-note"><span class="pulse"></span> بيانات حية من قاعدة البيانات</div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--new)"></i>${STATUS.new.label}</span>
+        <span><i style="background:var(--ok)"></i>${STATUS.interested.label}</span>
+        <span><i style="background:var(--bad)"></i>${STATUS.not_interested.label}</span>
+        <span><i style="background:var(--wait)"></i>${STATUS.no_answer.label}</span>
+      </div>
+      <div style="overflow-x:auto;">
+      <table class="dash-table">
+        <thead><tr><th>المحافظة</th><th>الإجمالي</th><th>التوزيع</th><th>${STATUS.interested.label}</th><th>${STATUS.not_interested.label}</th><th>${STATUS.no_answer.label}</th><th>لم يتم التواصل</th><th>تمت مقابلتهم</th></tr></thead>
+        <tbody>
+          ${rows.map(r => {
+            const t = r.total || 1;
+            return `<tr>
+              <td class="nm">${esc(r.name)}</td>
+              <td>${r.total}</td>
+              <td><div class="bar-track">
+                <span style="width:${r.c.interested / t * 100}%;background:var(--ok)"></span>
+                <span style="width:${r.c.not_interested / t * 100}%;background:var(--bad)"></span>
+                <span style="width:${r.c.no_answer / t * 100}%;background:var(--wait)"></span>
+                <span style="width:${r.c.new / t * 100}%;background:var(--new)"></span>
+              </div></td>
+              <td style="color:var(--ok);font-weight:700;">${r.c.interested}</td>
+              <td style="color:var(--bad);font-weight:700;">${r.c.not_interested}</td>
+              <td style="color:var(--wait);font-weight:700;">${r.c.no_answer}</td>
+              <td class="muted">${r.c.new}</td>
+              <td class="muted">${r.interviewed} / ${r.total}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderReportsTab() {
+  const interviewed = allApplicants.filter(a => a.interview_done);
+  const total = allApplicants.length || 1;
+
+  function dist(list, key) {
+    const c = {};
+    list.forEach(a => { const v = a[key] || 'غير محدد'; c[v] = (c[v] || 0) + 1; });
+    return c;
+  }
+  function distRowsHTML(counts, base) {
+    const b = base || Object.values(counts).reduce((s, v) => s + v, 0) || 1;
+    return Object.entries(counts).sort((a, b2) => b2[1] - a[1]).map(([lbl, v]) => `
+      <div class="dist-row">
+        <div class="lbl">${esc(lbl)}</div>
+        <div class="track"><span style="width:${(v / b * 100).toFixed(1)}%"></span></div>
+        <div class="val">${v}</div>
+      </div>
+    `).join('');
+  }
+
+  const genderDist = dist(interviewed, 'gender');
+  const availDist = dist(interviewed, 'fully_available');
+  const outGovDist = dist(interviewed, 'can_work_outside_gov');
+  const outResDist = dist(interviewed, 'can_work_outside_residence');
+  const holidaysDist = dist(interviewed, 'can_work_holidays');
+  const healthDist = dist(interviewed, 'health_issue');
+
+  const skillCounts = {};
+  interviewed.forEach(a => {
+    const skills = a.skills || [];
+    if (typeof skills === 'string') {
+      try { skills = JSON.parse(skills); } catch (e) { skills = []; }
+    }
+    skills.forEach(s => skillCounts[s] = (skillCounts[s] || 0) + 1);
+  });
+
+  const prefCounts = {};
+  interviewed.forEach(a => {
+    const pref = a.pref_qism1;
+    if (pref) {
+      const key = (a.governorate || '') + ' - ' + pref;
+      prefCounts[key] = (prefCounts[key] || 0) + 1;
+    }
+  });
+  const topPrefs = Object.entries(prefCounts).sort((a, b2) => b2[1] - a[1]).slice(0, 10);
+
+  document.getElementById('dashBody').innerHTML = `
+    <div class="dash-grid">
+      <div class="kpi"><div class="n">${allApplicants.length}</div><div class="l">إجمالي المتقدمين</div></div>
+      <div class="kpi"><div class="n" style="color:var(--ok)">${interviewed.length}</div><div class="l">تمت مقابلتهم</div></div>
+      <div class="kpi"><div class="n" style="color:var(--brand-2)">${Math.round(interviewed.length / total * 100)}%</div><div class="l">نسبة إنجاز المقابلات</div></div>
+      <div class="kpi"><div class="n" style="color:var(--wait)">${allApplicants.length - interviewed.length}</div><div class="l">بانتظار المقابلة</div></div>
+    </div>
+
+    <div class="report-card">
+      <h3>التوزيع النوعى (النوع)</h3>
+      ${Object.keys(genderDist).length ? distRowsHTML(genderDist) : '<div class="muted">لا توجد بيانات مقابلات بعد</div>'}
+    </div>
+
+    <div class="report-card">
+      <h3>مدى التفرغ والاستعداد للعمل</h3>
+      <div class="muted" style="margin-bottom:8px;font-weight:700;">متفرغ للعمل؟</div>
+      ${distRowsHTML(availDist)}
+      <div class="muted" style="margin:12px 0 8px;font-weight:700;">يعمل أيام العطلات؟</div>
+      ${distRowsHTML(holidaysDist)}
+      <div class="muted" style="margin:12px 0 8px;font-weight:700;">يمكنه العمل خارج محل الإقامة؟</div>
+      ${distRowsHTML(outResDist)}
+      <div class="muted" style="margin:12px 0 8px;font-weight:700;">يمكنه العمل خارج المحافظة؟</div>
+      ${distRowsHTML(outGovDist)}
+      <div class="muted" style="margin:12px 0 8px;font-weight:700;">لديه مانع صحى؟</div>
+      ${distRowsHTML(healthDist)}
+    </div>
+
+    <div class="report-card">
+      <h3>توزيع المهارات المتاحة</h3>
+      ${Object.keys(skillCounts).length ? distRowsHTML(skillCounts) : '<div class="muted">لا توجد بيانات مقابلات بعد</div>'}
+    </div>
+
+    <div class="report-card">
+      <h3>الأكثر طلباً كرغبة عمل أولى (أعلى 10)</h3>
+      ${topPrefs.length ? `<div class="rank-list">${topPrefs.map(([k, v], i) => `<div class="rank-item"><span>${i + 1}. ${esc(k)}</span><b>${v}</b></div>`).join('')}</div>` : '<div class="muted">لا توجد بيانات مقابلات بعد</div>'}
+    </div>
+  `;
+}
+
+/* ============ 12. User Management ============ */
+async function renderUserManagement() {
+  if (currentUser.role !== 'admin') {
+    toast('هذه الشاشة متاحة للمشرف العام فقط', 'err');
+    currentGov = null;
+    render();
+    return;
+  }
+
+  await loadUsers();
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="title">
+        <div class="grid-badge">GIS</div>
+        <div>
+          <h1>إدارة المستخدمين</h1>
+          <div class="sub">تخصيص حسابات مسؤولى المحافظات</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="btnBack">↩ قائمة المحافظات</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ws-head"><h2>حسابات المشرف العام</h2></div>
+      <div style="overflow-x:auto;">
+      <table class="um-table">
+        <thead><tr><th>اسم المستخدم</th><th>كلمة المرور</th><th></th></tr></thead>
+        <tbody>
+          ${usersCache.filter(u => u.role === 'admin').map(u => `
+            <tr>
+              <td class="nm">${esc(u.username)} <span class="role-pill">مشرف عام</span></td>
+              <td><input class="um-row-input" data-admin-pass="${esc(u.username)}" value="${esc(u.password)}" type="password"></td>
+              <td><button class="btn btn-outline btn-sm" data-save-admin="${esc(u.username)}">حفظ</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ws-head">
+        <h2>حسابات مسؤولى المحافظات</h2>
+        <div class="muted">اترك اسم المستخدم فارغاً لإلغاء حساب محافظة معينة</div>
+      </div>
+      <div style="overflow-x:auto;">
+      <table class="um-table">
+        <thead><tr><th>المحافظة</th><th>اسم المستخدم</th><th>كلمة المرور</th><th></th></tr></thead>
+        <tbody>
+          ${GOVS_LIST.map(g => {
+            const acc = usersCache.find(u => u.role === 'gov' && u.governorate === g);
+            return `<tr data-gov="${esc(g)}">
+              <td class="nm">${esc(g)}</td>
+              <td><input class="um-row-input" data-user="${esc(g)}" value="${acc ? esc(acc.username) : ''}" placeholder="اسم المستخدم"></td>
+              <td><input class="um-row-input" data-pass="${esc(g)}" value="${acc ? esc(acc.password) : ''}" placeholder="كلمة المرور" type="password"></td>
+              <td><button class="btn btn-outline btn-sm" data-save-gov="${esc(g)}">حفظ</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btnBack').onclick = () => { currentGov = null; render(); };
+
+  document.querySelectorAll('[data-save-admin]').forEach(btn => {
+    btn.onclick = async () => {
+      const uname = btn.dataset.saveAdmin;
+      const input = document.querySelector(`[data-admin-pass="${CSS.escape(uname)}"]`);
+      const newPass = input.value.trim();
+      if (!newPass) { toast('كلمة المرور مطلوبة', 'err'); return; }
+      const u = usersCache.find(x => x.role === 'admin' && x.username === uname);
+      if (u) u.password = newPass;
+      await saveUsers();
+      toast('تم تحديث كلمة المرور', 'ok');
+    };
+  });
+
+  document.querySelectorAll('[data-save-gov]').forEach(btn => {
+    btn.onclick = async () => {
+      const gov = btn.dataset.saveGov;
+      const uname = document.querySelector(`[data-user="${CSS.escape(gov)}"]`).value.trim();
+      const pass = document.querySelector(`[data-pass="${CSS.escape(gov)}"]`).value.trim();
+      usersCache = usersCache.filter(u => !(u.role === 'gov' && u.governorate === gov));
+      if (uname && pass) {
+        if (usersCache.some(u => u.username === uname)) {
+          toast('اسم المستخدم مستخدم بالفعل', 'err');
+          return;
+        }
+        usersCache.push({ id: uid(), username: uname, password: pass, role: 'gov', governorate: gov });
+      }
+      await saveUsers();
+      toast('تم حفظ الحساب', 'ok');
+      renderUserManagement();
+    };
+  });
+}
+
+async function saveUsers() {
+  try {
+    // Simple approach: delete all and re-insert (for small data)
+    const { error: delError } = await supabase.from(USERS_TABLE).delete().neq('id', '');
+    if (delError) throw delError;
+    const { error: insError } = await supabase.from(USERS_TABLE).insert(usersCache);
+    if (insError) throw insError;
+    return true;
+  } catch (err) {
+    toast('خطأ في حفظ المستخدمين: ' + err.message, 'err');
+    return false;
+  }
+}
+
+const GOVS_LIST = [
+  'القاهرة', 'الاسكندرية', 'بورسعيد', 'السويس', 'دمياط', 'الدقهلية',
+  'الشرقية', 'القليوبية', 'كفر الشيخ', 'الغربية', 'المنوفية', 'البحيرة',
+  'الاسماعيلية', 'الجيزة', 'بنى سويف', 'الفيوم', 'المنيا', 'أسيوط',
+  'سوهاج', 'قنا', 'أسوان', 'الأقصر', 'البحر الأحمر', 'الوادى الجديد',
+  'مطروح', 'شمال سيناء', 'جنوب سيناء'
+];
+
+/* ============ 13. Excel Export ============ */
+function exportGovToExcel(govName) {
+  const data = allApplicants.filter(a => a.governorate === govName);
+  if (!data.length) { toast('لا توجد بيانات للتصدير', 'err'); return; }
+  const rows = data.map(a => buildExportRow(a));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, govName);
+  XLSX.writeFile(wb, `متقدمو_${govName}.xlsx`);
+  toast('تم التصدير', 'ok');
+}
+
+function exportAllToExcel() {
+  if (!allApplicants.length) { toast('لا توجد بيانات', 'err'); return; }
+  const rows = allApplicants.map(a => buildExportRow(a));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'جميع المتقدمين');
+  XLSX.writeFile(wb, 'جميع_المتقدمين_المشروع.xlsx');
+  toast('تم التصدير', 'ok');
+}
+
+function buildExportRow(a) {
+  return {
+    'المحافظة': a.governorate || '',
+    'الاسم الرباعى': a.full_name || '',
+    'الرقم القومى': a.national_id || '',
+    'النوع': a.gender || '',
+    'رقم الهاتف الأساسى': a.phone || '',
+    'رقم الهاتف البديل': a.phone2 || '',
+    'العنوان': a.address || '',
+    'القسم / المركز': a.district || '',
+    'المؤهل': a.qualification || '',
+    'الكلية / المعهد': a.college || '',
+    'التخصص': a.specialization || '',
+    'سنة التخرج': a.grad_year || '',
+    'المهارات': Array.isArray(a.skills) ? a.skills.join(' - ') : (a.skills || ''),
+    'مهارات أخرى': a.skills_other || '',
+    'العمل خارج الإقامة': a.can_work_outside_residence || '',
+    'العمل خارج المحافظة': a.can_work_outside_gov || '',
+    'العمل أيام العطلات': a.can_work_holidays || '',
+    'متفرغ للعمل': a.fully_available || '',
+    'مانع صحى': a.health_issue || '',
+    'رغبة العمل الأولى': a.pref_qism1 || '',
+    'رغبة العمل الثانية': a.pref_qism2 || '',
+    'رغبة العمل الثالثة': a.pref_qism3 || '',
+    'حالة التواصل': a.status || '',
+    'حالة المقابلة': a.interview_done ? 'منجزة' : 'لم تتم',
+    'الملاحظات': a.notes || '',
+    'تاريخ التسجيل': a.created_at || ''
+  };
+}
+
+/* ============ 14. Initialize ============ */
+async function init() {
+  await fetchApplicants();
+  await loadUsers();
+  render();
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
