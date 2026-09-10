@@ -1265,6 +1265,11 @@ function renderDashboardShell(){
       </div>
       <div class="topbar-actions"><button class="btn btn-ghost" id="btnBack">↩ قائمة المحافظات</button></div>
     </div>
+    <div class="dashboard-intro">
+      <div class="dashboard-intro-icon">▦</div>
+      <div><strong>مركز المؤشرات والتحليلات</strong><span>قراءة سريعة لموقف المتقدمين ومستوى الإنجاز والتوزيعات الرئيسية</span></div>
+      <div class="dashboard-live"><span class="pulse"></span> بيانات محدثة تلقائيًا</div>
+    </div>
     <div class="tabs" style="flex-wrap:wrap;">
       <button class="tab-btn ${dashTab==='follow'?'active':''}" id="tabFollow">لوحة المتابعة</button>
       <button class="tab-btn ${dashTab==='reports'?'active':''}" id="tabReports">التقارير</button>
@@ -1780,6 +1785,41 @@ function renderUserManagement(profiles){
     };
   });
 }
+
+
+/* ============ الواجهة الجانبية المستوحاة من النموذج المرجعي ============ */
+function decorateReferenceShell(){
+  const app=document.getElementById('app');
+  if(!app || !currentUser || !app.querySelector('.topbar')) return;
+  if(app.querySelector('.reference-sidebar')) return;
+  app.classList.add('with-reference-sidebar');
+  const side=document.createElement('aside');
+  side.className='reference-sidebar';
+  const isFollowup=currentUser.role==='followup';
+  side.innerHTML=`
+    <div class="ref-brand"><div class="ref-brand-mark"><i></i><i></i><i></i><i></i></div><div><strong>حصر<span>+</span></strong><small>منصة المتابعة الميدانية</small></div></div>
+    <div class="ref-workspace"><span class="ref-work-icon">▦</span><div><small>مساحة العمل الحالية</small><b>المشروع القومي للحصر</b></div></div>
+    <div class="ref-section">لوحة التحكم</div>
+    <nav class="ref-nav">
+      <button data-ref-nav="dashboard" class="${currentGov==='__dashboard__'?'active':''}"><span>▦</span> نظرة عامة</button>
+      <button data-ref-nav="governorates" class="${!currentGov||currentGov==='__dashboard__'?'active':''}"><span>⌂</span> المحافظات</button>
+      <button data-ref-nav="reports" class="${isFollowup||currentGov==='__dashboard__'?'active':''}"><span>▤</span> التقارير والتحليلات</button>
+    </nav>
+    ${currentUser.role==='admin'?`<div class="ref-section">إدارة وتشغيل</div><nav class="ref-nav"><button data-ref-nav="users"><span>♙</span> إدارة المستخدمين</button><button data-ref-nav="transfers"><span>↔</span> طلبات النقل</button></nav>`:''}
+    <div class="ref-side-footer"><div class="ref-help"><b>مركز المتابعة</b><small>البيانات محدثة تلقائيًا</small></div><button class="ref-logout" data-ref-nav="logout">↪ تسجيل الخروج</button><div class="ref-profile"><span>${esc((currentUser.email||'م').slice(0,1).toUpperCase())}</span><div><b>${esc(currentUser.email||'مستخدم')}</b><small>${esc(roleLabel(currentUser.role))}</small></div></div></div>`;
+  app.prepend(side);
+  side.querySelectorAll('[data-ref-nav]').forEach(btn=>btn.onclick=()=>{
+    const key=btn.dataset.refNav;
+    if(key==='dashboard'){ dashTab='follow'; openDashboard(); }
+    else if(key==='reports'){ dashTab='reports'; openDashboard(); }
+    else if(key==='governorates'){ currentGov=null; render(); }
+    else if(key==='users'){ openUserManagement(); }
+    else if(key==='transfers'){ openTransferRequests(); }
+    else if(key==='logout'){ logout(); }
+  });
+}
+const referenceShellObserver=new MutationObserver(()=>setTimeout(decorateReferenceShell,0));
+referenceShellObserver.observe(document.getElementById('app'),{childList:true});
 
 /* ============ بدء التشغيل ============ */
 (async function bootstrap(){
