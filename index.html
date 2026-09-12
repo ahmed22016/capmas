@@ -186,9 +186,10 @@
   .gov-card .mini-bar span{height:100%;}
   .gov-card .foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);}
   .gov-card .foot b{color:var(--ink);font-family:'Cairo';}
-  .gov-card .gov-progress-label{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:10px;margin-bottom:5px;margin-top:10px;}
-  .gov-card .gov-progress-label strong{color:var(--brand-2);font-size:10.5px;}
-  .gov-card .progress-track{height:4px;}
+  .gov-card .gov-progress-label{display:flex;justify-content:space-between;align-items:center;color:var(--ink-soft);font-size:10px;margin-bottom:5px;margin-top:10px;gap:8px;}
+  .gov-card .gov-progress-label span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .gov-card .gov-progress-label strong{color:var(--brand-2);font-size:11px;flex-shrink:0;font-family:'Cairo';font-weight:800;}
+  .gov-card .progress-track{height:5px;border-radius:3px;}
 
   /* workspace */
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;}
@@ -1330,14 +1331,15 @@ async function renderLanding(){
       ${govCards.map(g=>{
         const c = byGov[g.name] || {total:0,interested:0,interviewed:0};
         const target = g.target || 0;
-        const progress = target > 0 ? Math.min(100, Math.round((c.total / target) * 100)) : 0;
+        const interestedPct = target > 0 ? Math.round((c.interested / target) * 100) : 0;
+        const barWidth = Math.min(100, interestedPct);
         return `
-        <div class="gov-card" data-name="${esc(g.name)}">
+        <div class="gov-card" data-name="${esc(g.name)}" title="المستهدف: ${target} | الراغبون: ${c.interested} | إجمالي المتقدمين: ${c.total}">
           <div class="code">${esc(g.code)}</div>
           <h3>${esc(g.name)}</h3>
           <div class="foot"><span>عدد المتقدمين</span><b>${c.total}</b></div>
-          <div class="gov-progress-label"><span>نسبة الإنجاز</span><strong>${progress}%</strong></div>
-          <div class="progress-track"><span style="width:${progress}%"></span></div>
+          <div class="gov-progress-label"><span>نسبة الراغبين من المستهدف</span><strong>${interestedPct}%</strong></div>
+          <div class="progress-track"><span style="width:${barWidth}%"></span></div>
         </div>`;
       }).join('')}
     </div>
