@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استمارة التسجيل الذاتي – مشروع الحصر الخرائطي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --primary: #0F3D5C;
+    --primary-hover: #155E75;
+    --gold: #B98B2A;
+    --bg: #F5F6F8;
+    --paper: #FFFFFF;
+    --border: #E3E7EE;
+    --text: #122540;
+    --muted: #4B5C74;
+    --bad: #C4402A;
+    --bad-bg: #FBE4DF;
+    --ok: #0E8F5F;
+    --ok-bg: #DEF3E8;
+    --radius: 12px;
+    --shadow: 0 4px 20px rgba(18, 37, 64, 0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', system-ui, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px 16px; }
+  
+  .wrap { width: 100%; max-width: 760px; }
+
+  .header { background: var(--primary); color: white; padding: 24px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); margin-bottom: 20px; }
+  .header h1 { font-size: 1.35rem; font-weight: 800; margin-bottom: 6px; }
+  .header p { font-size: 0.9rem; opacity: 0.9; }
+
+  .card { background: var(--paper); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+
+  /* شروط وطبيعة العمل (الشاشة الأولى) */
+  .terms-card {
+    background: #F0F4F9;
+    border-right: 4px solid var(--primary-hover);
+    padding: 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.92rem;
+    line-height: 1.8;
+  }
+  .terms-card h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.05rem; }
+  .terms-card ul { margin-right: 20px; margin-bottom: 12px; }
+  .terms-card li { margin-bottom: 6px; }
+  .highlight-box { background: #E3F0FF; border: 1px solid #BAE6FD; padding: 12px 14px; border-radius: 8px; color: #0A3A6E; font-weight: 700; margin-top: 12px; }
+
+  /* شبكة العناوين والحقول */
+  .section-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--primary);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 6px;
+    margin: 22px 0 14px 0;
+  }
+  .section-title:first-of-type { margin-top: 0; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .row2 { grid-template-columns: 1fr; } }
+  
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  label { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+  label .req { color: var(--bad); }
+  
+  .input, select {
+    width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; color: var(--text);
+  }
+  .input:focus, select:focus { border-color: var(--primary-hover); box-shadow: 0 0 0 3px rgba(21, 94, 117, 0.1); }
+  
+  .btn {
+    width: 100%; background: var(--gold); color: #2B1E04; border: none; padding: 13px; border-radius: 8px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;
+  }
+  .btn:hover { opacity: 0.95; }
+  .btn:disabled { background: var(--muted); color: #fff; cursor: not-allowed; opacity: 0.6; }
+
+  .msg { padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; display: none; }
+  .msg.err { background: var(--bad-bg); color: #7A1E12; border: 1px solid #FECACA; display: block; }
+
+  /* الشاشة الثالثة: النجاح والشكر */
+  .success-box {
+    text-align: center;
+    padding: 30px 15px;
+  }
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--ok-bg);
+    color: var(--ok);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 20px auto;
+    border: 2px solid #BBF7D0;
+  }
+  .success-box h2 {
+    color: var(--ok);
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+  }
+  .success-box p {
+    color: var(--text);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .summary-card {
+    background: #F8FAFC;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: right;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+
+  .note { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 12px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <h1>التسجيل الذاتي – مشروع الحصر الخرائطي</h1>
+    <p>بوابة تسجيل المتقدمين للعمل الميداني وتحديث الخرائط الرقمية</p>
+  </div>
+
+  <div class="card">
+    <div id="msgBox" class="msg"></div>
+
+    <!-- الشاشة الأولى: الإقرار وتوضيح طبيعة العمل والمؤهلات -->
+    <div id="stepTerms">
+      <div class="terms-card">
+        <h3>⚠️ إقرار وتوضيح طبيعة العمل والمؤهلات المطلوبة</h3>
+        <p>يرجى قراءة الشروط والتعليمات التالية بتركيز قبل البدء في تسجيل البيانات:</p>
+        
+        <br>
+        <strong>📌 المؤهلات والخبرات المطلوبة:</strong>
+        <ul>
+          <li>تخصصات: ليسانس آداب (جغرافيا/مساحة/GIS)، هندسة (مدني/عمارة)، تخطيط عمراني، معهد مساحة، أو تخصصات ذات صلة.</li>
+          <li>القدرة والمهارة التامة على التعامل مع <strong>الخرائط الرقمية</strong> والتطبيقات الميدانية عبر أجهزة التابلت.</li>
+        </ul>
+
+        <strong>📌 طبيعة ومراحل العمل الميداني:</strong>
+        <ul>
+          <li><strong>المرحلة الأولى (الحصر والتعديل الخرائطي):</strong> تتضمن الحصر الميداني وتحديث الخرائط بمعدل مستهدف حوالي <strong>60 مبنى يومياً</strong> بمتوسط <strong>25 يوم عمل شهرياً</strong>.</li>
+          <li><strong>الأجر:</strong> يعتمد بشكل أساسي على الإنتاجية وإنجاز المستهدفات.</li>
+          <li><strong>المرحلة الثانية (لصق الملصقات):</strong> المرور الميداني ولصق الملصقات الخاصة بكل مبنى.</li>
+          <li><strong>الاستمرارية:</strong> المتقدم الناجح سيكون مرشحاً مشاركاً في أعمال التعداد لاحقاً كـ <strong>مراجع</strong>.</li>
+        </ul>
+
+        <strong>📌 تجهيزات وتسليم العهدة:</strong>
+        <ul>
+          <li>يتسلم المتقدم <strong>تابلت مخصص كعهدة شخصية</strong> لاستخدامه في العمل الميداني، ويتعهد بالحفاظ عليه وتسليمه سليماً بنهاية المشروع.</li>
+        </ul>
+
+        <div class="highlight-box">
+          💡 سيتم تحويل الطلب تلقائياً لنظام مراجعة المحافظة للتواصل مع المقبولين طبقاً لاستيفاء الشروط.
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 0.95rem; font-weight: 700; color: var(--text); line-height: 1.6;">
+          <input type="checkbox" id="chkAgree" style="width: 18px; height: 18px; margin-top:3px; accent-color: var(--primary);">
+          قرأت كافة الشروط والمؤهلات أعلاه، وأقر بقدرتي على التعامل مع الخرائط الرقمية والتابلت ورغبتي والترشح للعمل الميداني.
+        </label>
+      </div>
+
+      <button id="btnGoToForm" class="btn" disabled>المتابعة لتسجيل البيانات ⬅</button>
+    </div>
+
+    <!-- الشاشة الثانية: نموذج التسجيل -->
+    <div id="stepForm" style="display: none;">
+      <form id="regForm">
+        
+        <!-- 1. البيانات الشخصية -->
+        <div class="section-title">1. البيانات الشخصية</div>
+        <div class="field">
+          <label>الاسم الرباعي <span class="req">*</span></label>
+          <input type="text" class="input" id="f_name" placeholder="أدخل الاسم الرباعي كما هو مدون ببطاقة الرقم القومي" required>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>الرقم القومي (14 رقم) <span class="req">*</span></label>
+            <input type="text" class="input" id="f_nid" maxlength="14" placeholder="2xxxxxxxxxxxxx" required>
+          </div>
+          <div class="field">
+            <label>النوع <span class="req">*</span></label>
+            <select id="f_gender" required>
+              <option value="">-- اختر النوع --</option>
+              <option value="ذكر">ذكر</option>
+              <option value="أنثى">أنثى</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>رقم الهاتف المحمول <span class="req">*</span></label>
+            <input type="tel" class="input" id="f_phone" maxlength="11" placeholder="01xxxxxxxxx" required>
+          </div>
+          <div class="field">
+            <label>رقم هاتف بديل <span class="req">*</span></label>
+            <input type="tel" class="input" id="f_phone2" maxlength="11" placeholder="01xxxxxxxxx" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>العنوان بالتفصيل <span class="req">*</span></label>
+          <input type="text" class="input" id="f_address" placeholder="اسم الشارع / رقم المبنى / الحي أو المنطقة" required>
+        </div>
+
+        <!-- 2. الموقع الجغرافي -->
+        <div class="section-title">2. الموقع الجغرافي (محل الإقامة)</div>
+        <div class="row2">
+          <div class="field">
+            <label>المحافظة <span class="req">*</span></label>
+            <select id="f_gov" required>
+              <option value="">جارِ تحميل المحافظات...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>القسم / المركز <span class="req">*</span></label>
+            <select id="f_district" required>
+              <option value="">اختر المحافظة أولاً</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3. البيانات العلمية والمؤهل -->
+        <div class="section-title">3. البيانات العلمية والمؤهل</div>
+        <div class="field">
+          <label>المؤهل الدراسي <span class="req">*</span></label>
+          <select id="f_qual" required>
+            <option value="">-- اختر المؤهل الدراسي --</option>
+            <option value="ليسانس آداب (خرائط - مساحة - نظم معلومات جغرافية - GIS)">ليسانس آداب (خرائط - مساحة - نظم معلومات جغرافية - GIS)</option>
+            <option value="بكالوريوس هندسة (مدني - عمارة)">بكالوريوس هندسة (مدني - عمارة)</option>
+            <option value="تخصص ذات علاقة بنظم المعلومات الجغرافية">تخصص ذات علاقة بنظم المعلومات الجغرافية</option>
+            <option value="التخطيط العمرانى">التخطيط العمرانى</option>
+            <option value="معهد مساحه">معهد مساحه</option>
+            <option value="مؤهلات اخرى">مؤهلات اخرى</option>
+          </select>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>الكلية / المعهد <span class="req">*</span></label>
+            <input type="text" class="input" id="f_college" placeholder="أدخل اسم الكلية أو المعهد" required>
+          </div>
+          <div class="field">
+            <label>التخصص بالتفصيل <span class="req">*</span></label>
+            <input type="text" class="input" id="f_spec" placeholder="أدخل اسم التخصص الدقيق" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>سنة التخرج <span class="req">*</span></label>
+          <input type="text" class="input" id="f_gradyear" placeholder="YYYY" maxlength="4" required>
+        </div>
+
+        <!-- 4. أسئلة الجاهزية الميدانية -->
+        <div class="section-title">4. أسئلة الجاهزية الميدانية</div>
+        <div class="field">
+          <label>هل تستطيع العمل خارج المحافظة؟ <span class="req">*</span></label>
+          <select id="f_outgov" required>
+            <option value="">-- اختر الإجابة --</option>
+            <option value="نعم">نعم</option>
+            <option value="لا">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل تستطيع العمل أيام العطلات والراحات الرسمية؟ <span class="req">*</span></label>
+          <select id="f_holidays" required>
+            <option value="">-- اختر الإجابة --</option>
+            <option value="نعم">نعم</option>
+            <option value="لا">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل أنت متفرغ تماماً للعمل الميداني؟ <span class="req">*</span></label>
+          <select id="f_avail" required>
+            <option value="">-- اختر الإجابة --</option>
+            <option value="نعم">نعم (متفرغ تماماً)</option>
+            <option value="لا">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل لديك أي مانع صحي يمنعك من القيام بالعمل الميداني الشاق؟ <span class="req">*</span></label>
+          <select id="f_health" required>
+            <option value="">-- اختر الإجابة --</option>
+            <option value="لا">لا (سليم صحياً ولا يوجد مانع)</option>
+            <option value="نعم">نعم (يوجد مانع صحي)</option>
+          </select>
+        </div>
+
+        <!-- 5. الرغبات المكانية -->
+        <div class="section-title">5. الرغبات المكانية للعمل (الأقسام / المراكز)</div>
+        <div class="field">
+          <label>رغبة العمل الأولى <span class="req">*</span></label>
+          <select id="f_pref1" required>
+            <option value="">اختر المحافظة أولاً</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>رغبة العمل الثانية <span class="req">*</span></label>
+          <select id="f_pref2" required>
+            <option value="">اختر المحافظة أولاً</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>رغبة العمل الثالثة <span class="req">*</span></label>
+          <select id="f_pref3" required>
+            <option value="">اختر المحافظة أولاً</option>
+          </select>
+        </div>
+
+        <!-- 6. التأكيد والإرسال -->
+        <div class="section-title">6. تأكيد التسجيل</div>
+        <div class="field">
+          <label>سؤال الأمان: ما هو حاصل جمع 5 + 3 = ؟ <span class="req">*</span></label>
+          <input type="number" class="input" id="f_captcha" placeholder="أدخل ناتج الجمع" required>
+        </div>
+
+        <button type="submit" class="btn" id="btnSubmit" style="margin-top:16px;">إرسال طلب التسجيل</button>
+        <div class="note">بالتسجيل، أنت تقر بصحة البيانات وتتحمل كامل المسؤولية القانونية في حال ثبوت عكس ذلك.</div>
+      </form>
+    </div>
+
+    <!-- الشاشة الثالثة: رسالة الشكر وتأكيد التسجيل -->
+    <!-- الشاشة الثالثة: رسالة الشكر وتأكيد التسجيل والمستندات -->
+    <div id="stepSuccess" style="display: none;">
+      <div class="success-box">
+        <div class="success-icon">✓</div>
+        <h2>تم تسجيل طلبك بنجاح!</h2>
+        
+        <p style="font-size: 0.98rem; line-height: 1.8; color: var(--text); margin-bottom: 20px;">
+          نرجو من سيادتكم التكرم بالتوجه إلى <strong>المكتب الإقليمي للجهاز بمحافظة (<span id="successGovName" style="color: var(--primary); font-weight: 800;">-</span>)</strong> خلال <strong>48 ساعة عمل</strong> من تاريخ تقديم الطلب، وذلك لتسليم الأوراق والمستندات المطلوبة للتحقق من صحة البيانات:
+        </p>
+
+        <div style="background: #FFFBEB; border: 1px solid #FDE68A; padding: 14px 18px; border-radius: 8px; text-align: right; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8;">
+          <strong style="color: #92400E;">📑 المستندات المطلوبة للتقديم:</strong>
+          <ul style="margin-right: 20px; margin-top: 6px; color: #78350F;">
+            <li>صورة من بطاقة الرقم القومي (سارية).</li>
+            <li>صورة من شهادة المؤهل الدراسي.</li>
+            <li>السيرة الذاتية (CV).</li>
+          </ul>
+        </div>
+
+        <div style="background: #EFF6FF; border: 1px solid #BFDBFE; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; color: #1E40AF;">
+          📍 <strong>لمعرفة عنوان وموقع المكتب الإقليمي لمحافظتك:</strong><br>
+          <a href="https://www.capmas.gov.eg/contact" target="_blank" rel="noopener noreferrer" style="color: #2563EB; font-weight: 700; text-decoration: underline;">اضغط هنا للوصول لموقع عناوين الفروع (CAPMAS)</a>
+        </div>
+
+        <div class="summary-card">
+          <strong>📌 ملخص بيانات طلب التسجيل:</strong><br>
+          • <strong>الاسم:</strong> <span id="summaryName">-</span><br>
+          • <strong>الرقم القومي:</strong> <span id="summaryNid">-</span><br>
+          • <strong>المحافظة:</strong> <span id="summaryGov">-</span><br>
+          • <strong>رقم التواصل:</strong> <span id="summaryPhone">-</span>
+        </div>
+
+        <button class="btn" onclick="resetToBeginning()" style="background: var(--primary); color: #fff;">تقديم طلب جديد</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // تهيئة اتصال Supabase Backend
+  const SUPABASE_URL = 'https://rbtnwqdwccvuxhyxwszp.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidG53cWR3Y2N2dXhoeXh3c3pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NjI2MzYsImV4cCI6MjEwMzQzODYzNn0.UmUaEbtpFusODGF8dsheYUKjRQN36XeWiC3mxD_AxK8';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const chkAgree = document.getElementById('chkAgree');
+  const btnGoToForm = document.getElementById('btnGoToForm');
+
+  chkAgree.onchange = () => { btnGoToForm.disabled = !chkAgree.checked; };
+  btnGoToForm.onclick = () => {
+    document.getElementById('stepTerms').style.display = 'none';
+    document.getElementById('stepForm').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  function esc(s){ return String(s==null?'':s); }
+  function showMsg(text, kind) {
+    const box = document.getElementById('msgBox');
+    box.className = `msg ${kind}`;
+    box.textContent = text;
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function validateNationalId(nid) {
+    return /^[23][0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(01|02|03|04|11|12|13|14|15|16|17|18|19|21|22|23|24|25|26|27|28|29|31|32|33|34|35|88)[0-9]{5}$/.test(nid);
+  }
+
+  function validatePhone(phone) {
+    return /^01[0125][0-9]{8}$/.test(phone);
+  }
+
+  // إعادة الاستمارة للوضع الأول
+  function resetToBeginning() {
+    document.getElementById('regForm').reset();
+    document.getElementById('chkAgree').checked = false;
+    document.getElementById('btnGoToForm').disabled = true;
+    document.getElementById('stepSuccess').style.display = 'none';
+    document.getElementById('stepTerms').style.display = 'block';
+    document.getElementById('msgBox').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // تحميل المحافظات من جدول public.governorates
+  async function loadGovs() {
+    const { data, error } = await sb
+      .from('governorates')
+      .select('gov_code, gov_name')
+      .order('gov_code', { ascending: true, nullsFirst: false });
+      
+    if (error) {
+      console.error('خطأ في جلب المحافظات:', error);
+      return;
+    }
+    
+    const GOVS = data || [];
+    const sel = document.getElementById('f_gov');
+    sel.innerHTML = '<option value="">-- اختر المحافظة --</option>' + GOVS.map(g => `<option value="${esc(g.gov_name)}" data-code="${esc(g.gov_code)}">${esc(g.gov_name)}</option>`).join('');
+  }
+
+  // تحميل الأقسام والمراكز من جدول public.districts
+  async function loadDistricts(govName) {
+    const distSel = document.getElementById('f_district');
+    distSel.innerHTML = '<option value="">جارِ التحميل...</option>';
+    
+    const { data, error } = await sb
+      .from('districts')
+      .select('district_name')
+      .eq('governorate', govName)
+      .order('id', { ascending: true });
+      
+    if (error) {
+      console.error('خطأ في جلب الأقسام والمراكز:', error);
+      return;
+    }
+
+    const list = data || [];
+    const options = list.map(d => `<option value="${esc(d.district_name)}">${esc(d.district_name)}</option>`).join('');
+    
+    distSel.innerHTML = '<option value="">-- اختر القسم / المركز --</option>' + options;
+
+    ['f_pref1', 'f_pref2', 'f_pref3'].forEach((id, idx) => {
+      document.getElementById(id).innerHTML = `<option value="">اختر الرغبة ${idx+1}</option>` + options;
+    });
+  }
+
+  document.getElementById('f_gov').addEventListener('change', (e) => {
+    if (e.target.value) {
+      loadDistricts(e.target.value);
+    } else {
+      document.getElementById('f_district').innerHTML = '<option value="">اختر المحافظة أولاً</option>';
+      ['f_pref1', 'f_pref2', 'f_pref3'].forEach(id => document.getElementById(id).innerHTML = '<option value="">اختر المحافظة أولاً</option>');
+    }
+  });
+
+  loadGovs();
+
+  // معالجة نموذج التسجيل والإدراج المباشر في جدول public.applicants
+  document.getElementById('regForm').onsubmit = async (e) => {
+    e.preventDefault();
+
+    if (document.getElementById('f_captcha').value.trim() !== '8') {
+      showMsg('إجابة سؤال الأمان غير صحيحة (5 + 3 = 8)', 'err');
+      return;
+    }
+
+    const govSelect = document.getElementById('f_gov');
+    const selectedGovOption = govSelect.options[govSelect.selectedIndex];
+    const govCodeVal = selectedGovOption ? selectedGovOption.getAttribute('data-code') : null;
+
+    // المخطط المطابق لجدول public.applicants
+    const applicantPayload = {
+      full_name: document.getElementById('f_name').value.trim(),
+      national_id: document.getElementById('f_nid').value.trim(),
+      gender: document.getElementById('f_gender').value,
+      phone: document.getElementById('f_phone').value.trim(),
+      phone2: document.getElementById('f_phone2').value.trim(),
+      address: document.getElementById('f_address').value.trim(),
+      governorate: govSelect.value,
+      district: document.getElementById('f_district').value,
+      gov_code: govCodeVal,
+      qualification: document.getElementById('f_qual').value,
+      college: document.getElementById('f_college').value.trim(),
+      specialization: document.getElementById('f_spec').value.trim(),
+      grad_year: document.getElementById('f_gradyear').value.trim(),
+      can_work_outside_gov: document.getElementById('f_outgov').value,
+      can_work_holidays: document.getElementById('f_holidays').value,
+      fully_available: document.getElementById('f_avail').value,
+      health_issue: document.getElementById('f_health').value,
+      pref_qism1: document.getElementById('f_pref1').value,
+      pref_qism2: document.getElementById('f_pref2').value,
+      pref_qism3: document.getElementById('f_pref3').value,
+      status: 'جديد',
+      manual: false,
+      source: 'self'
+    };
+
+    // التحقق الشامل من استيفاء جميع الحقول الإجبارية
+    for (const [key, val] of Object.entries(applicantPayload)) {
+      if (val === "" || val === null) {
+        showMsg('يرجى استيفاء كافة الحقول المطلوبة بالكامل، جميع الحقول إجبارية.', 'err');
+        return;
+      }
+    }
+
+    if (!validateNationalId(applicantPayload.national_id)) {
+      showMsg('الرقم القومي غير صحيح (يجب أن يتكون من 14 رقماً بناءً على البيانات الرسمية).', 'err');
+      return;
+    }
+
+    if (!validatePhone(applicantPayload.phone)) {
+      showMsg('رقم الهاتف المحمول الأساسي غير صحيح (يجب أن يتكون من 11 رقماً محلياً).', 'err');
+      return;
+    }
+
+    if (!validatePhone(applicantPayload.phone2)) {
+      showMsg('رقم الهاتف البديل غير صحيح (يجب أن يتكون من 11 رقماً محلياً).', 'err');
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'جارِ إرسال البيانات...';
+
+    try {
+      // إدراج مباشر في جدول public.applicants
+      const { data, error } = await sb
+        .from('applicants')
+        .insert([applicantPayload]);
+
+      if (!error) {
+        // ملء شاشة الملخص
+        document.getElementById('successGovName').textContent = applicantPayload.governorate;
+        document.getElementById('summaryName').textContent = applicantPayload.full_name;
+        document.getElementById('summaryNid').textContent = applicantPayload.national_id;
+        document.getElementById('summaryGov').textContent = applicantPayload.governorate;
+        document.getElementById('summaryPhone').textContent = applicantPayload.phone;
+
+        // إخفاء النموذج وإظهار شاشة النجاح
+        document.getElementById('msgBox').style.display = 'none';
+        document.getElementById('stepForm').style.display = 'none';
+        document.getElementById('stepSuccess').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        if (error.code === '23505') {
+          showMsg('هذا الرقم القومي مسجل بالفعل من قبل، لا يمكن التسجيل أكثر من مرة.', 'err');
+        } else {
+          showMsg('تعذر إرسال الطلب: ' + error.message, 'err');
+        }
+      }
+    } catch (err) {
+      showMsg('تعذر الاتصال بالخادم، تحقق من الاتصال بالإنترنت.', 'err');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'إرسال طلب التسجيل';
+  };
+</script>
+</body>
+</html>
