@@ -92,11 +92,43 @@
 
   /* landing */
   .hero{
-    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    padding:26px 24px;margin-bottom:22px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg, #123A57 0%, #0F2A3F 100%);
+    border-radius:18px;
+    padding:32px 39px;
+    margin-bottom:22px;
+    box-shadow:0 16px 33px rgba(24,65,92,.12);
+    min-height:200px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:20px;
   }
-  .hero h2{margin:0 0 6px;font-size:21px;}
-  .hero p{margin:0;color:var(--ink-soft);font-size:14px;line-height:1.9;}
+  .hero::before{
+    content:"";position:absolute;
+    width:500px;height:500px;left:-200px;top:-180px;
+    border:1px solid rgba(255,255,255,.08);border-radius:50%;
+    box-shadow:0 0 0 36px rgba(255,255,255,.028), 0 0 0 74px rgba(255,255,255,.024), 0 0 0 112px rgba(255,255,255,.017);
+    pointer-events:none;
+  }
+  .hero-copy{position:relative;z-index:2;max-width:600px;}
+  .hero .eyebrow{display:flex;align-items:center;gap:7px;color:#D9B369;font-size:11.5px;font-weight:700;margin-bottom:13px;}
+  .hero .live-dot{width:6px;height:6px;background:#E4BF72;border-radius:50%;box-shadow:0 0 0 4px rgba(228,191,114,.14);}
+  .hero h2{margin:0;color:#fff;font-family:'Cairo';font-weight:800;font-size:26px;letter-spacing:-.8px;line-height:1.45;}
+  .hero h2 em{font-style:normal;color:#E2BA68;}
+  .hero p{margin:8px 0 20px;color:#B5C7D2;font-size:13px;line-height:1.9;}
+  .hero-actions{display:flex;gap:9px;flex-wrap:wrap;}
+  .hero-visual{position:relative;width:300px;height:190px;flex-shrink:0;}
+  .hero-map-grid{position:absolute;inset:17px 3px 0;background-image:linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);background-size:23px 23px;transform:perspective(260px) rotateX(48deg) rotateZ(-7deg);opacity:.7;}
+  .hero-orbit{position:absolute;border:1px solid rgba(214,175,91,.3);border-radius:50%;transform:rotate(-25deg);}
+  .orbit-one{width:270px;height:115px;top:34px;right:-4px;}
+  .orbit-two{width:225px;height:90px;top:47px;right:22px;border-color:rgba(255,255,255,.14);}
+  .hero-stat{position:absolute;left:4px;bottom:7px;padding:13px 16px;min-width:132px;border-radius:11px;background:rgba(7,31,49,.68);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(7px);}
+  .hero-stat span{display:block;color:#A7BAC7;font-size:10px;}
+  .hero-stat strong{display:block;color:#fff;font-family:'Cairo';font-weight:700;font-size:23px;margin-top:2px;}
+  .hero-stat-foot{display:flex;gap:3px;align-items:center;color:#96D3AD;font-size:9.5px;margin-top:4px;}
+  .hero-point{width:9px;height:9px;position:absolute;border:2px solid #E5BE6E;background:#153E5D;border-radius:50%;box-shadow:0 0 0 5px rgba(223,181,93,.12);}
+  .point-one{right:42px;top:67px;}
+  .point-two{right:139px;top:28px;}
+  .point-three{right:190px;top:115px;}
   .stat-row{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;}
   .stat-chip{
     flex:1;min-width:130px;background:var(--paper);border:1px solid var(--line);
@@ -108,7 +140,34 @@
   .stat-chip.ok .n{color:var(--ok);}
   .stat-chip.bad .n{color:var(--bad);}
   .stat-chip.wait .n{color:var(--wait);}
-
+  /* KPI Cards */
+  .kpi-grid-new{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0;}
+  .kpi-card{min-height:145px;position:relative;overflow:hidden;padding:17px 18px;background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:0 6px 18px rgba(31,57,78,.035);}
+  .kpi-card::after{content:"";position:absolute;bottom:-40px;left:-40px;width:120px;height:90px;border-radius:50%;background:var(--kpi-wash);filter:blur(2px);}
+  .accent-navy{--kpi-wash:#EAF1F6;}
+  .accent-teal{--kpi-wash:#E7F5F2;}
+  .accent-gold{--kpi-wash:#FFF4D9;}
+  .accent-rose{--kpi-wash:#FFF0ED;}
+  .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .kpi-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;color:#286378;background:#EFF5F8;font-size:16px;}
+  .accent-teal .kpi-icon{color:#188477;background:#E7F6F2;}
+  .accent-gold .kpi-icon{color:#BA8628;background:#FFF4DA;}
+  .accent-rose .kpi-icon{color:#C1685C;background:#FFF0EE;}
+  .trend{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:700;border-radius:99px;padding:4px 6px;}
+  .trend.up{color:#23846D;background:#E9F6F0;}
+  .trend.down{color:#BB645A;background:#FFF0ED;}
+  .kpi-card > strong{display:block;font-family:'Cairo';font-weight:800;font-size:25px;color:var(--ink);line-height:1;}
+  .kpi-card > span{display:block;color:var(--ink-soft);font-size:11.5px;margin-top:5px;}
+  .kpi-progress{margin-top:14px;}
+  .kpi-progress small{display:block;color:var(--ink-soft);font-size:9.5px;margin-top:5px;}
+  .progress-track{height:5px;overflow:hidden;background:var(--new-soft);border-radius:99px;}
+  .progress-track span{display:block;height:100%;border-radius:inherit;background:#2B8D83;}
+  .accent-navy .progress-track span{background:#3B748C;}
+  .accent-gold .progress-track span{background:#C69A43;}
+  .accent-rose .progress-track span{background:#CE7B6F;}
+  @media(max-width:900px){.kpi-grid-new{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.kpi-grid-new{grid-template-columns:1fr;}}
+  
   .gov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px;}
   .gov-card{
     background:var(--panel);border:1px solid var(--line);border-radius:12px;
@@ -116,7 +175,7 @@
     transition:border-color .15s ease, transform .12s ease;
     position:relative;
   }
-  .gov-card:hover{border-color:var(--brand-2);transform:translateY(-2px);}
+  .gov-card:hover{border-color:var(--brand-2);transform:translateY(-2px);box-shadow:0 7px 17px rgba(37,88,106,.07);}
   .gov-card .code{
     position:absolute;top:12px;left:12px;font-family:'Cairo';font-weight:800;
     font-size:11px;color:var(--gold);background:var(--gold-soft);
@@ -127,6 +186,9 @@
   .gov-card .mini-bar span{height:100%;}
   .gov-card .foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);}
   .gov-card .foot b{color:var(--ink);font-family:'Cairo';}
+  .gov-card .gov-progress-label{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:10px;margin-bottom:5px;margin-top:10px;}
+  .gov-card .gov-progress-label strong{color:var(--brand-2);font-size:10.5px;}
+  .gov-card .progress-track{height:4px;}
 
   /* workspace */
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;}
@@ -236,6 +298,63 @@
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow);}
   .kpi .n{font-family:'Cairo';font-weight:800;font-size:26px;}
   .kpi .l{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+
+  /* Donut Chart */
+  .donut-wrap{display:flex;align-items:center;justify-content:center;gap:26px;min-height:194px;flex-wrap:wrap;}
+  .donut{width:148px;height:148px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--new) 0 0%, var(--ok) 0 0%, var(--wait) 0 0%, var(--bad) 0 0%);position:relative;}
+  .donut::before{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--panel);}
+  .donut-hole{position:relative;z-index:1;text-align:center;}
+  .donut-hole strong,.donut-hole span{display:block;}
+  .donut-hole strong{font-family:'Cairo';font-weight:700;font-size:20px;color:var(--ink);}
+  .donut-hole span{font-size:10px;color:var(--ink-soft);margin-top:-2px;}
+  .donut-labels{display:grid;gap:11px;width:128px;}
+  .donut-labels div{display:grid;grid-template-columns:9px 1fr auto;align-items:center;gap:6px;color:var(--ink-soft);font-size:11px;}
+  .donut-labels strong{color:var(--ink);font-size:11px;font-family:'Cairo';}
+  .donut-dot{width:7px;height:7px;border-radius:50%;}
+  .dot-teal{background:var(--ok);}
+  .dot-blue{background:var(--new);}
+  .dot-gold{background:var(--wait);}
+  .dot-rose{background:var(--bad);}
+
+  /* Sidebar drawer للموبايل */
+  .mobile-drawer-toggle{
+    display:none;position:fixed;bottom:20px;left:20px;z-index:40;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--brand);color:#fff;border:none;cursor:pointer;
+    box-shadow:0 8px 20px rgba(15,61,92,.3);
+    font-size:22px;align-items:center;justify-content:center;
+  }
+  .mobile-drawer-toggle:hover{transform:translateY(-2px);}
+  .mobile-drawer{
+    position:fixed;top:0;right:-320px;width:300px;height:100vh;
+    background:var(--panel);z-index:60;transition:right .25s ease;
+    box-shadow:-10px 0 35px rgba(17,37,61,.15);padding:20px;overflow-y:auto;
+  }
+  .mobile-drawer.open{right:0;}
+  .mobile-drawer-overlay{
+    display:none;position:fixed;inset:0;z-index:55;
+    background:rgba(12,34,52,.35);
+  }
+  .mobile-drawer-overlay.open{display:block;}
+  .mobile-drawer h3{margin:0 0 14px;font-size:15px;color:var(--ink);}
+  .mobile-drawer .drawer-btn{
+    width:100%;padding:12px 14px;margin-bottom:8px;border-radius:10px;
+    background:var(--paper);border:1px solid var(--line);color:var(--ink);
+    font-family:'Tajawal';font-weight:700;font-size:13.5px;cursor:pointer;
+    text-align:right;display:flex;align-items:center;gap:8px;
+  }
+  .mobile-drawer .drawer-btn:hover{background:var(--new-soft);}
+  .mobile-drawer .drawer-btn.primary{background:var(--gold);color:#2b1e04;border-color:var(--gold);}
+  .mobile-drawer .drawer-btn.ghost{background:transparent;}
+  .mobile-drawer .drawer-close{
+    position:absolute;top:14px;left:14px;width:32px;height:32px;
+    border-radius:8px;background:var(--paper);border:1px solid var(--line);
+    color:var(--ink-soft);cursor:pointer;font-size:16px;
+  }
+  @media(max-width:720px){
+    .mobile-drawer-toggle{display:flex;}
+    .topbar-actions{display:none !important;}
+  }
   .dash-table th, .dash-table td{font-size:12.6px;}
   .bar-track{background:var(--new-soft);border-radius:5px;height:9px;overflow:hidden;display:flex;min-width:120px;}
   .bar-track span{height:100%;}
@@ -613,23 +732,80 @@ async function renderLanding(){
     </div>
 
     <div class="hero">
-      <h2>اختر المحافظة</h2>
-      <th> تم اعداد المنصه بواسطه الفروع الاقليمية - لاى استفسار يسعدنا تواصلك د. أحمد وائل شوقى -</th>
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="live-dot"></span> بيانات حية من قاعدة المشروع</div>
+        <h2>نظرة موحّدة على <em>قوة فريقك الميداني</em></h2>
+        <p>تابع أداء المحافظات وحوّل بيانات المتقدمين إلى قرارات تشغيلية أسرع وأكثر دقة.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btnHeroDash">📊 لوحة المتابعة${isAdmin?' العامة':''}</button>
+        </div>
       </div>
+      <div class="hero-visual">
+        <div class="hero-orbit orbit-one"></div>
+        <div class="hero-orbit orbit-two"></div>
+        <div class="hero-map-grid"></div>
+        <div class="hero-stat">
+          <span>إجمالي المتقدمين</span>
+          <strong>${rows.length}</strong>
+          <div class="hero-stat-foot">📈 ${uniqueGovs().length} محافظة</div>
+        </div>
+        <div class="hero-point point-one"></div>
+        <div class="hero-point point-two"></div>
+        <div class="hero-point point-three"></div>
+      </div>
+    </div>
+
     <div class="gov-grid">
-    
       ${govCards.map(g=>{
         const c = byGov[g.name] || {total:0,interested:0,interviewed:0};
+        const target = g.target || 0;
+        const progress = target > 0 ? Math.min(100, Math.round((c.total / target) * 100)) : 0;
         return `
         <div class="gov-card" data-name="${esc(g.name)}">
           <div class="code">${esc(g.code)}</div>
           <h3>${esc(g.name)}</h3>
           <div class="foot"><span>عدد المتقدمين</span><b>${c.total}</b></div>
+          <div class="gov-progress-label"><span>نسبة الإنجاز</span><strong>${progress}%</strong></div>
+          <div class="progress-track"><span style="width:${progress}%"></span></div>
         </div>`;
       }).join('')}
     </div>
+
+    <!-- Mobile Drawer Toggle -->
+    <button class="mobile-drawer-toggle" id="btnDrawer">☰</button>
+    <div class="mobile-drawer-overlay" id="drawerOverlay"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+      <button class="drawer-close" id="drawerClose">✕</button>
+      <h3>القائمة</h3>
+      <button class="drawer-btn primary" id="drwDash">📊 لوحة المتابعة</button>
+      ${isAdmin ? `<button class="drawer-btn" id="drwUsers">👥 إدارة المستخدمين</button>` : ''}
+      ${isAdmin ? `<button class="drawer-btn" id="drwTransfers">🔄 طلبات النقل ${pendingCount ? `(${pendingCount})` : ''}</button>` : ''}
+      ${currentUser.role!=='followup' ? `<button class="drawer-btn" id="drwExport">⬇ تصدير Excel</button>` : ''}
+      <button class="drawer-btn" id="drwTheme">🌙 تبديل الوضع</button>
+      <button class="drawer-btn" id="drwPass">🔑 كلمة المرور</button>
+      <button class="drawer-btn ghost" id="drwLogout">🚪 خروج</button>
+    </div>
   `;
+  // ربط أزرار Drawer
+  const drawer = document.getElementById('mobileDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const openDrawer = ()=>{ drawer.classList.add('open'); drawerOverlay.classList.add('open'); };
+  const closeDrawer = ()=>{ drawer.classList.remove('open'); drawerOverlay.classList.remove('open'); };
+  document.getElementById('btnDrawer').onclick = openDrawer;
+  document.getElementById('drawerClose').onclick = closeDrawer;
+  drawerOverlay.onclick = closeDrawer;
+  document.getElementById('drwDash').onclick = ()=>{ closeDrawer(); openDashboard(); };
+  if(isAdmin) document.getElementById('drwUsers').onclick = ()=>{ closeDrawer(); openUserManagement(); };
+  if(isAdmin) document.getElementById('drwTransfers').onclick = ()=>{ closeDrawer(); openTransferRequests(); };
+  const drwExport = document.getElementById('drwExport');
+  if(drwExport) drwExport.onclick = ()=>{ closeDrawer(); exportAllToExcel(); };
+  document.getElementById('drwTheme').onclick = ()=>{ toggleTheme(); closeDrawer(); };
+  document.getElementById('drwPass').onclick = ()=>{ closeDrawer(); changePasswordFlow(); };
+  document.getElementById('drwLogout').onclick = ()=>{ closeDrawer(); logout(); };
+  
   document.getElementById('btnDash').onclick = openDashboard;
+  const heroBtn = document.getElementById('btnHeroDash');
+  if(heroBtn) heroBtn.onclick = openDashboard;
   if(isAdmin) document.getElementById('btnUsers').onclick = openUserManagement;
   if(isAdmin) document.getElementById('btnTransfers').onclick = openTransferRequests;
   const exportAllBtn = document.getElementById('btnExportAll');
@@ -696,13 +872,38 @@ function renderWorkspace(){
       </div>
     </div>
 
-    <div class="panel">
-      <div class="stat-row">
-        <div class="stat-chip new"><div class="n">${c['جديد']}</div><div class="l">${STATUS['جديد'].label}</div></div>
-        <div class="stat-chip ok"><div class="n">${c['مهتم']}</div><div class="l">${STATUS['مهتم'].label}</div></div>
-        <div class="stat-chip bad"><div class="n">${c['غير مهتم']}</div><div class="l">${STATUS['غير مهتم'].label}</div></div>
-        <div class="stat-chip wait"><div class="n">${c['لا يرد']}</div><div class="l">${STATUS['لا يرد'].label}</div></div>
-        <div class="stat-chip ok"><div class="n">${interviewedCount}</div><div class="l">تمت مقابلتهم من ${currentApplicants.length}</div></div>
+    <div class="kpi-grid-new">
+      <div class="kpi-card accent-navy">
+        <div class="kpi-top"><span class="kpi-icon">👥</span><span class="trend up">إجمالي</span></div>
+        <strong>${currentApplicants.length}</strong>
+        <span>إجمالي المتقدمين</span>
+      </div>
+      <div class="kpi-card accent-teal">
+        <div class="kpi-top"><span class="kpi-icon">✅</span><span class="trend up">مباشر</span></div>
+        <strong>${c['مهتم']}</strong>
+        <span>${STATUS['مهتم'].label}</span>
+        <div class="kpi-progress">
+          <div class="progress-track"><span style="width:${currentApplicants.length ? (c['مهتم']/currentApplicants.length*100) : 0}%"></span></div>
+          <small>${currentApplicants.length ? Math.round(c['مهتم']/currentApplicants.length*100) : 0}% من الإجمالي</small>
+        </div>
+      </div>
+      <div class="kpi-card accent-gold">
+        <div class="kpi-top"><span class="kpi-icon">🎯</span><span class="trend up">منجزة</span></div>
+        <strong>${interviewedCount}</strong>
+        <span>تمت مقابلتهم</span>
+        <div class="kpi-progress">
+          <div class="progress-track"><span style="width:${currentApplicants.length ? (interviewedCount/currentApplicants.length*100) : 0}%"></span></div>
+          <small>${currentApplicants.length ? Math.round(interviewedCount/currentApplicants.length*100) : 0}% من الإجمالي</small>
+        </div>
+      </div>
+      <div class="kpi-card accent-rose">
+        <div class="kpi-top"><span class="kpi-icon">⏳</span><span class="trend down">متابعة</span></div>
+        <strong>${c['جديد']}</strong>
+        <span>${STATUS['جديد'].label}</span>
+        <div class="kpi-progress">
+          <div class="progress-track"><span style="width:${currentApplicants.length ? (100 - c['جديد']/currentApplicants.length*100) : 0}%"></span></div>
+          <small>نسبة اكتمال التواصل</small>
+        </div>
       </div>
     </div>
 
@@ -1672,6 +1873,12 @@ function renderDashboardShell(){
 }
 function renderFollowTab(){
   const {rows, totals} = computeDashRows();
+  const t = totals.total || 1;
+  const pctNew = (totals['جديد']/t*100).toFixed(1);
+  const pctOk = (totals['مهتم']/t*100).toFixed(1);
+  const pctWait = (totals['لا يرد']/t*100).toFixed(1);
+  const pctBad = (totals['غير مهتم']/t*100).toFixed(1);
+  const donutBg = `conic-gradient(var(--new) 0 ${pctNew}%, var(--ok) ${pctNew}% ${(parseFloat(pctNew)+parseFloat(pctOk)).toFixed(1)}%, var(--wait) ${(parseFloat(pctNew)+parseFloat(pctOk)).toFixed(1)}% ${(parseFloat(pctNew)+parseFloat(pctOk)+parseFloat(pctWait)).toFixed(1)}%, var(--bad) ${(parseFloat(pctNew)+parseFloat(pctOk)+parseFloat(pctWait)).toFixed(1)}% 100%)`;
   document.getElementById('dashBody').innerHTML = `
     <div class="dash-grid">
       <div class="kpi"><div class="n">${totals.total}</div><div class="l">إجمالي المتقدمين</div></div>
@@ -1679,6 +1886,25 @@ function renderFollowTab(){
       <div class="kpi"><div class="n" style="color:var(--bad)">${totals['غير مهتم']}</div><div class="l">${STATUS['غير مهتم'].label}</div></div>
       <div class="kpi"><div class="n" style="color:var(--wait)">${totals['لا يرد']}</div><div class="l">${STATUS['لا يرد'].label}</div></div>
     </div>
+
+    <div class="panel">
+      <div class="ws-head"><h2>توزيع الحالات</h2></div>
+      <div class="donut-wrap">
+        <div class="donut" style="background:${donutBg};">
+          <div class="donut-hole">
+            <strong>${totals.total}</strong>
+            <span>الإجمالي</span>
+          </div>
+        </div>
+        <div class="donut-labels">
+          <div><span class="donut-dot dot-teal"></span><span>مهتم</span><strong>${pctOk}%</strong></div>
+          <div><span class="donut-dot dot-blue"></span><span>جديد</span><strong>${pctNew}%</strong></div>
+          <div><span class="donut-dot dot-gold"></span><span>لا يرد</span><strong>${pctWait}%</strong></div>
+          <div><span class="donut-dot dot-rose"></span><span>غير مهتم</span><strong>${pctBad}%</strong></div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="ws-head">
         <h2>نسبة الإنجاز: ${totals.total?Math.round(totals.contacted/totals.total*100):0}%</h2>
