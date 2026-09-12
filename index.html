@@ -315,7 +315,47 @@
   .dot-blue{background:var(--new);}
   .dot-gold{background:var(--wait);}
   .dot-rose{background:var(--bad);}
+  /* Bar Chart */
+  .bar-chart-wrap{padding:4px 0;}
+  .bar-chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:11.5px;color:var(--ink-soft);}
+  .bar-chart-legend span{display:flex;align-items:center;gap:5px;}
+  .bar-chart-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;}
+  .bar-chart{display:flex;flex-direction:column;gap:10px;}
+  .bar-row{display:grid;grid-template-columns:130px 1fr 90px;gap:12px;align-items:center;padding:6px 0;}
+  .bar-row .bar-label{font-weight:700;color:var(--ink);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-row .bar-track-new{
+    height:24px;border-radius:6px;background:var(--new-soft);overflow:hidden;
+    display:flex;position:relative;
+  }
+  .bar-row .bar-track-new span{height:100%;transition:width .4s ease;}
+  .bar-row .bar-track-new .bar-seg-new{background:var(--new);}
+  .bar-row .bar-track-new .bar-seg-ok{background:var(--ok);}
+  .bar-row .bar-track-new .bar-seg-wait{background:var(--wait);}
+  .bar-row .bar-track-new .bar-seg-bad{background:var(--bad);}
+  .bar-row .bar-track-new .bar-total-label{
+    position:absolute;left:8px;top:50%;transform:translateY(-50%);
+    color:#fff;font-weight:800;font-size:11px;font-family:'Cairo';
+    text-shadow:0 1px 2px rgba(0,0,0,.3);
+    pointer-events:none;
+  }
+  .bar-row .bar-pct{font-family:'Cairo';font-weight:800;font-size:13px;color:var(--brand-2);text-align:left;direction:ltr;}
+  .bar-empty{text-align:center;padding:30px;color:var(--ink-soft);font-size:13px;}
+  @media(max-width:720px){
+    .bar-row{grid-template-columns:90px 1fr 60px;gap:8px;}
+    .bar-row .bar-label{font-size:11px;}
+    .bar-row .bar-pct{font-size:11px;}
+  }
 
+  /* Sticky Header for tables */
+  table{position:relative;}
+  .sticky-table thead th{
+    position:sticky;top:0;z-index:5;
+    background:var(--panel);
+    box-shadow:0 2px 4px rgba(0,0,0,.04);
+  }
+  .sticky-table-wrap{
+    max-height:600px;overflow-y:auto;border-radius:12px;
+  }
   /* Sidebar drawer للموبايل */
   .mobile-drawer-toggle{
     display:none;position:fixed;bottom:20px;left:20px;z-index:40;
@@ -1910,29 +1950,42 @@ function renderFollowTab(){
         <h2>نسبة الإنجاز: ${totals.total?Math.round(totals.contacted/totals.total*100):0}%</h2>
         <div class="auto-note"><span class="pulse"></span> تحديث تلقائى كل 20 ثانية &nbsp; <button class="btn btn-outline btn-sm" id="btnRefreshNow">تحديث الآن</button> &nbsp; <button class="btn btn-outline btn-sm" id="btnExportFollow">⬇ تصدير Excel</button></div>
       </div>
-      <div style="overflow-x:auto;">
-      <table class="dash-table">
-        <thead><tr><th>المحافظة</th><th>الإجمالي</th><th>التوزيع</th><th>${STATUS['مهتم'].label}</th><th>${STATUS['غير مهتم'].label}</th><th>${STATUS['لا يرد'].label}</th><th>لم يتم التواصل</th><th>تمت مقابلتهم</th></tr></thead>
-        <tbody>
+
+      <div class="bar-chart-legend">
+        <span><i style="background:var(--new)"></i> لم يتم التواصل</span>
+        <span><i style="background:var(--ok)"></i> يرغب في العمل</span>
+        <span><i style="background:var(--wait)"></i> لم يرد</span>
+        <span><i style="background:var(--bad)"></i> لا يرغب</span>
+      </div>
+
+      ${rows.length ? `
+      <div class="bar-chart-wrap">
+        <div class="bar-chart">
           ${rows.map(r=>{
-            const t = r.total||1;
-            return `<tr>
-              <td class="nm">${esc(r.name)}</td><td>${r.total}</td>
-              <td><div class="bar-track">
-                <span style="width:${r.c['مهتم']/t*100}%;background:var(--ok)"></span>
-                <span style="width:${r.c['غير مهتم']/t*100}%;background:var(--bad)"></span>
-                <span style="width:${r.c['لا يرد']/t*100}%;background:var(--wait)"></span>
-                <span style="width:${r.c['جديد']/t*100}%;background:var(--new)"></span>
-              </div></td>
-              <td style="color:var(--ok);font-weight:700;">${r.c['مهتم']}</td>
-              <td style="color:var(--bad);font-weight:700;">${r.c['غير مهتم']}</td>
-              <td style="color:var(--wait);font-weight:700;">${r.c['لا يرد']}</td>
-              <td class="muted">${r.c['جديد']}</td>
-              <td class="muted">${r.interviewed} / ${r.total}</td>
-            </tr>`;
+            const t = r.total || 1;
+            const maxTotal = Math.max(...rows.map(x=>x.total), 1);
+            const width = Math.max(4, (r.total / maxTotal) * 100);
+            return `
+              <div class="bar-row">
+                <div class="bar-label" title="${esc(r.name)}">${esc(r.name)}</div>
+                <div class="bar-track-new" style="width:${width}%;">
+                  <span class="bar-seg-new" style="width:${r.c['جديد']/t*100}%"></span>
+                  <span class="bar-seg-ok" style="width:${r.c['مهتم']/t*100}%"></span>
+                  <span class="bar-seg-wait" style="width:${r.c['لا يرد']/t*100}%"></span>
+                  <span class="bar-seg-bad" style="width:${r.c['غير مهتم']/t*100}%"></span>
+                  <span class="bar-total-label">${r.total}</span>
+                </div>
+                <div class="bar-pct">${r.total ? Math.round(r.c['مهتم']/r.total*100) : 0}% ✅</div>
+              </div>
+            `;
           }).join('')}
-        </tbody>
-      </table>
+        </div>
+      </div>
+      ` : `<div class="bar-empty">لا توجد بيانات لعرضها</div>`}
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink-soft);">
+        <strong style="color:var(--ink);">ملخص:</strong>
+        ${rows.length} محافظة · إجمالي ${totals.total} متقدم · مهتمون ${totals['مهتم']} · تمت مقابلتهم ${totals.interviewed}
       </div>
     </div>
   `;
