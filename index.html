@@ -681,6 +681,17 @@
   html.dark .toast {
     background: #1C394B;
   }
+  /* Hero في الوضع الليلي - تباين أفضل */
+  html.dark .hero{
+    background:linear-gradient(135deg, #0A1E2E 0%, #071624 100%);
+  }
+  html.dark .hero h2{
+    background:linear-gradient(90deg, #E8EEF4 0%, #E8EEF4 40%, #E2BA68 50%, #E8EEF4 60%, #E8EEF4 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
 
   /* ============ Reports Enhancements ============ */
   .reports-grid{
@@ -863,6 +874,144 @@
   html.dark .mini-donut-legend .mdl-row .mdl-lbl{color:var(--ink);}
   html.dark .progress-rich .pr-track{background:#1C394B;}
 
+  /* ============ Hero Enhancements ============ */
+  /* Floating animation for dots */
+  @keyframes heroFloat1{
+    0%,100%{transform:translate(0,0);opacity:1;}
+    50%{transform:translate(-8px,-12px);opacity:.85;}
+  }
+  @keyframes heroFloat2{
+    0%,100%{transform:translate(0,0);opacity:1;}
+    50%{transform:translate(10px,-8px);opacity:.8;}
+  }
+  @keyframes heroFloat3{
+    0%,100%{transform:translate(0,0);opacity:1;}
+    50%{transform:translate(-6px,10px);opacity:.85;}
+  }
+  /* Pulse ring for dots */
+  @keyframes dotPulse{
+    0%{box-shadow:0 0 0 5px rgba(223,181,93,.12);}
+    50%{box-shadow:0 0 0 12px rgba(223,181,93,.04);}
+    100%{box-shadow:0 0 0 5px rgba(223,181,93,.12);}
+  }
+  /* Orbit rotation (very slow) */
+  @keyframes orbitRotate{
+    0%{transform:rotate(-25deg);}
+    100%{transform:rotate(335deg);}
+  }
+  /* Shimmer on hero title */
+  @keyframes heroShimmer{
+    0%{background-position:-200% center;}
+    100%{background-position:200% center;}
+  }
+  /* Grid glow pulse */
+  @keyframes gridGlow{
+    0%,100%{opacity:.55;}
+    50%{opacity:.85;}
+  }
+  /* Hero stat pop-in */
+  @keyframes statPopIn{
+    0%{transform:scale(.9);opacity:0;}
+    60%{transform:scale(1.03);opacity:1;}
+    100%{transform:scale(1);opacity:1;}
+  }
+  /* Live dot pulse (already exists but enhanced) */
+  @keyframes livePulse{
+    0%,100%{box-shadow:0 0 0 4px rgba(228,191,114,.14);}
+    50%{box-shadow:0 0 0 10px rgba(228,191,114,.02);}
+  }
+
+  /* Apply enhanced hero styles */
+  .hero .live-dot{
+    animation:livePulse 2s ease-in-out infinite;
+  }
+  .hero-point{
+    animation:dotPulse 2.4s ease-in-out infinite;
+    transition:transform .3s ease;
+  }
+  .hero-point.point-one{
+    animation:heroFloat1 4s ease-in-out infinite, dotPulse 2.4s ease-in-out infinite;
+  }
+  .hero-point.point-two{
+    animation:heroFloat2 5s ease-in-out infinite, dotPulse 2.4s ease-in-out infinite;
+    animation-delay:.5s, .3s;
+  }
+  .hero-point.point-three{
+    animation:heroFloat3 4.5s ease-in-out infinite, dotPulse 2.4s ease-in-out infinite;
+    animation-delay:.3s, .6s;
+  }
+  .hero-orbit{
+    animation:orbitRotate 60s linear infinite;
+    transform-origin:center;
+  }
+  .hero-orbit.orbit-two{
+    animation-duration:90s;
+    animation-direction:reverse;
+  }
+  .hero-map-grid{
+    animation:gridGlow 4s ease-in-out infinite;
+  }
+  .hero-stat{
+    animation:statPopIn .8s cubic-bezier(.34,1.56,.64,1) .3s both;
+  }
+  .hero-stat strong{
+    display:inline-block;
+    font-variant-numeric:tabular-nums;
+  }
+  /* Title shimmer */
+  .hero h2{
+    background:linear-gradient(90deg, #fff 0%, #fff 40%, #E2BA68 50%, #fff 60%, #fff 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:heroShimmer 6s linear infinite;
+  }
+  .hero h2 em{
+    -webkit-text-fill-color:#E2BA68;
+  }
+  /* Hero button glow */
+  .hero-actions .btn-primary{
+    position:relative;overflow:hidden;
+    animation:statPopIn .6s cubic-bezier(.34,1.56,.64,1) .5s both;
+  }
+  .hero-actions .btn-primary::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.25) 50%, transparent 70%);
+    transform:translateX(-100%);
+    animation:btnShine 4s ease-in-out infinite;
+  }
+  @keyframes btnShine{
+    0%,80%,100%{transform:translateX(-100%);}
+    90%{transform:translateX(100%);}
+  }
+  /* Hero background subtle shift */
+  .hero{
+    background-size:200% 200%;
+    animation:heroGradientShift 15s ease-in-out infinite;
+  }
+  @keyframes heroGradientShift{
+    0%,100%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+  }
+  /* Accessibility: reduce motion */
+  @media (prefers-reduced-motion: reduce){
+    .hero .live-dot,
+    .hero-point,
+    .hero-orbit,
+    .hero-map-grid,
+    .hero-stat,
+    .hero h2,
+    .hero-actions .btn-primary,
+    .hero-actions .btn-primary::after{
+      animation:none !important;
+    }
+  }
+  @media (max-width:720px){
+    .hero-visual{display:none;}
+    .hero{min-height:auto;padding:24px 20px;}
+    .hero h2{font-size:22px;}
+  }
 
 </style>
 </head>
@@ -1168,7 +1317,7 @@ async function renderLanding(){
         <div class="hero-map-grid"></div>
         <div class="hero-stat">
           <span>إجمالي المتقدمين</span>
-          <strong>${rows.length}</strong>
+          <strong id="heroStatNumber" data-target="${rows.length}">0</strong>
           <div class="hero-stat-foot">📈 ${uniqueGovs().length} محافظة</div>
         </div>
         <div class="hero-point point-one"></div>
@@ -1236,6 +1385,30 @@ async function renderLanding(){
   document.getElementById('btnChangePass').onclick = changePasswordFlow;
   updateThemeButtons();
   document.querySelectorAll('.gov-card').forEach(el=> el.onclick = ()=> openGov(el.dataset.name));
+  
+  // Count-up animation للـ Hero stat
+  const heroNum = document.getElementById('heroStatNumber');
+  if(heroNum){
+    const target = parseInt(heroNum.dataset.target, 10) || 0;
+    const duration = 1200; // 1.2 ثانية
+    const startTime = performance.now();
+    const startVal = 0;
+    
+    function animateNum(now){
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutQuart
+      const eased = 1 - Math.pow(1 - progress, 4);
+      const current = Math.floor(startVal + (target - startVal) * eased);
+      heroNum.textContent = new Intl.NumberFormat('ar-EG').format(current);
+      if(progress < 1){
+        requestAnimationFrame(animateNum);
+      } else {
+        heroNum.textContent = new Intl.NumberFormat('ar-EG').format(target);
+      }
+    }
+    requestAnimationFrame(animateNum);
+  }
 }
 
 /* ---------- شاشة عمل المحافظة ---------- */
