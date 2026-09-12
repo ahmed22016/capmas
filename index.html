@@ -354,7 +354,7 @@
     box-shadow:0 2px 4px rgba(0,0,0,.04);
   }
   .sticky-table-wrap{
-    max-height:600px;overflow-y:auto;border-radius:12px;
+    max-height:70vh;overflow-y:auto;border-radius:12px;
   }
   /* Sidebar drawer للموبايل */
   .mobile-drawer-toggle{
@@ -465,6 +465,14 @@
   }
   html.dark tbody tr:hover {
     background: #183143;
+  }
+  html.dark .sticky-table thead th {
+    background: #1C394B;
+    color: var(--ink-soft);
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+  html.dark .sticky-table-wrap {
+    background: var(--panel);
   }
   html.dark .gov-card {
     background: var(--panel);
@@ -970,8 +978,8 @@ function renderWorkspace(){
       </div>
 
       ${pageItems.length? `
-      <div style="overflow-x:auto;">
-      <table>
+      <div class="sticky-table-wrap">
+      <table class="sticky-table">
         <thead><tr><th>الاسم</th><th>الرقم القومى</th><th>رقم الهاتف</th><th>القسم/المركز</th><th>المؤهل</th><th>حالة التواصل</th><th>المقابلة</th><th></th></tr></thead>
         <tbody>
           ${pageItems.map(a=>`
@@ -1145,8 +1153,8 @@ async function openDistrictReport(){
         <span><i style="background:var(--bad);"></i> غير مهتم</span>
         <span><i style="background:var(--new);"></i> جديد</span>
       </div>
-      <div style="overflow-x:auto;">
-      <table class="dash-table">
+      <div class="sticky-table-wrap">
+      <table class="dash-table sticky-table">
         <thead><tr>
           <th>القسم / المركز</th>
           <th>المستهدف باحثين</th>  <!-- العمود الجديد -->
@@ -1424,8 +1432,8 @@ function renderTransferRequests(rows){
     </div>
     <div class="panel">
       ${rows.length? `
-      <div style="overflow-x:auto;">
-      <table class="um-table">
+      <div class="sticky-table-wrap">
+      <table class="um-table sticky-table">
         <thead><tr><th>الاسم</th><th>الرقم القومى</th><th>المحافظة الحالية</th><th>المحافظة المطلوبة</th><th>طلب بواسطة</th><th></th></tr></thead>
         <tbody>
           ${rows.map(r=>`
@@ -2368,8 +2376,8 @@ function renderUserManagement(profiles){
 
     <div class="panel">
       <div class="ws-head"><h2>الحسابات الحالية</h2></div>
-      <div style="overflow-x:auto;">
-      <table class="um-table">
+      <div class="sticky-table-wrap">
+      <table class="um-table sticky-table">
         <thead><tr><th>البريد الإلكترونى</th><th>الدور</th><th>المحافظة / المحافظات</th><th></th></tr></thead>
         <tbody>
           ${profiles.map(p=>`
