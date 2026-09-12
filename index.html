@@ -257,6 +257,130 @@
     .topbar{flex-direction:column;align-items:flex-start;gap:12px;}
   }
 
+  /* ============ Dark Mode ============ */
+  html.dark {
+    --ink: #E8EEF4;
+    --ink-soft: #9CB0BD;
+    --paper: #0D1A27;
+    --panel: #132536;
+    --line: #243C4D;
+    --brand: #0F3D5C;
+    --brand-2: #4B8291;
+    --gold: #D9B369;
+    --gold-soft: #3C3421;
+    --ok: #47A381;
+    --ok-soft: #123B39;
+    --bad: #D2776B;
+    --bad-soft: #3D2522;
+    --wait: #D4AA52;
+    --wait-soft: #3C3421;
+    --new: #8EA6B4;
+    --new-soft: #1C394B;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  html.dark body {
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  }
+  html.dark .topbar {
+    background: #0F2A3F;
+  }
+  html.dark .btn-ghost {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.2);
+  }
+  html.dark .btn-outline {
+    background: var(--panel);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  html.dark .input,
+  html.dark select.input {
+    background: #0D1A27;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  html.dark table {
+    background: var(--panel);
+  }
+  html.dark tbody tr:hover {
+    background: #183143;
+  }
+  html.dark .gov-card {
+    background: var(--panel);
+  }
+  html.dark .gov-card:hover {
+    border-color: var(--brand-2);
+  }
+  html.dark .modal {
+    background: var(--panel);
+    color: var(--ink);
+  }
+  html.dark .overlay {
+    background: rgba(0,0,0,.6);
+  }
+  html.dark .login-card {
+    background: var(--panel);
+  }
+  html.dark .login-card .grid-badge,
+  html.dark .topbar .grid-badge {
+    background: rgba(255,255,255,.08);
+  }
+  html.dark .report-card,
+  html.dark .panel {
+    background: var(--panel);
+    border-color: var(--line);
+  }
+  html.dark .stat-chip {
+    background: #0D1A27;
+    border-color: var(--line);
+  }
+  html.dark .empty-state {
+    color: var(--ink-soft);
+  }
+  html.dark .kpi {
+    background: var(--panel);
+    border-color: var(--line);
+  }
+  html.dark .badge.new { background: var(--new-soft); color: var(--new); }
+  html.dark .badge.interested { background: var(--ok-soft); color: var(--ok); }
+  html.dark .badge.not_interested { background: var(--bad-soft); color: var(--bad); }
+  html.dark .badge.no_answer { background: var(--wait-soft); color: var(--wait); }
+  html.dark .login-hint {
+    background: #0D1A27;
+    border-color: var(--line);
+    color: var(--ink-soft);
+  }
+  html.dark .auto-note {
+    color: var(--ink-soft);
+  }
+  html.dark .dist-row .lbl { color: var(--ink-soft); }
+  html.dark .rank-item { background: #0D1A27; }
+  html.dark .status-select {
+    background: var(--panel);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  html.dark .icon-btn {
+    background: var(--panel);
+    border-color: var(--line);
+    color: var(--ink-soft);
+  }
+  html.dark .icon-btn:hover {
+    border-color: var(--brand-2);
+    color: var(--brand-2);
+  }
+  html.dark .pagination span {
+    color: var(--ink-soft);
+  }
+  html.dark .back-link { color: var(--brand-2); }
+  html.dark .breadcrumb { color: var(--ink-soft); }
+  html.dark .breadcrumb span { color: var(--ink); }
+  html.dark .toast {
+    background: #1C394B;
+  }
+
 </style>
 </head>
 <body>
@@ -482,6 +606,7 @@ async function renderLanding(){
         ${isAdmin? `<button class="btn btn-ghost" id="btnUsers">إدارة المستخدمين</button>` : ''}
         ${isAdmin? `<button class="btn btn-ghost" id="btnTransfers">🔄 طلبات نقل المحافظة${pendingCount?` (${pendingCount})`:''}</button>` : ''}
         ${currentUser.role!=='followup' ? `<button class="btn btn-ghost" id="btnExportAll">⬇ تصدير ${(isAdmin||isFollowup)?'كل البيانات':'بيانات محافظاتى'} Excel</button>` : ''}
+        <button class="btn btn-ghost" id="btnTheme" title="تبديل الوضع الليلي/النهاري">🌙</button>
         <button class="btn btn-ghost" id="btnChangePass">🔑 تغيير كلمة المرور</button>
         <button class="btn btn-ghost" id="btnLogout">خروج</button>
       </div>
@@ -511,6 +636,7 @@ async function renderLanding(){
   if(exportAllBtn) exportAllBtn.onclick = exportAllToExcel;
   document.getElementById('btnLogout').onclick = logout;
   document.getElementById('btnChangePass').onclick = changePasswordFlow;
+  updateThemeButtons();
   document.querySelectorAll('.gov-card').forEach(el=> el.onclick = ()=> openGov(el.dataset.name));
 }
 
@@ -566,6 +692,7 @@ function renderWorkspace(){
         ${currentUser.role==='admin'? `<button class="btn btn-ghost" id="btnImportGov">⬆ استيراد تحديثات من Excel</button>` : ''}
         <button class="btn btn-ghost" id="btnChangePass">🔑 كلمة المرور</button>
         ${canEdit() ? `<button class="btn btn-primary" id="btnAdd">+ إضافة متقدم جديد</button>` : ''}
+         <button class="btn btn-ghost" id="btnTheme" title="تبديل الوضع الليلي/النهاري">🌙</button>
       </div>
     </div>
 
@@ -682,6 +809,7 @@ function renderWorkspace(){
     };
   });
   document.querySelectorAll('[data-edit]').forEach(btn=> btn.onclick = ()=> openApplicantModal(btn.dataset.edit));
+  updateThemeButtons();
 }
 
 /* ---------- شاشة تقارير الأقسام / المراكز ---------- */
@@ -1540,6 +1668,7 @@ function renderDashboardShell(){
   else if(dashTab==='status') renderStatusTab();
   else if(dashTab==='qualification') renderQualificationTab();
   else renderOutsideWorkTab();
+  updateThemeButtons();
 }
 function renderFollowTab(){
   const {rows, totals} = computeDashRows();
@@ -2034,6 +2163,32 @@ function renderUserManagement(profiles){
     };
   });
 }
+
+/* ============ Dark Mode ============ */
+function initTheme(){
+  const saved = localStorage.getItem('hasr-dark');
+  if(saved === '1') {
+    document.documentElement.classList.add('dark');
+  }
+}
+function toggleTheme(){
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('hasr-dark', isDark ? '1' : '0');
+  // تحديث كل أزرار الثيم
+  document.querySelectorAll('#btnTheme').forEach(btn => {
+    btn.textContent = isDark ? '☀️' : '🌙';
+  });
+}
+function updateThemeButtons(){
+  const isDark = document.documentElement.classList.contains('dark');
+  document.querySelectorAll('#btnTheme').forEach(btn => {
+    btn.textContent = isDark ? '☀️' : '🌙';
+    btn.onclick = toggleTheme;
+  });
+}
+
+// استدعاء فوري
+initTheme();
 
 /* ============ بدء التشغيل ============ */
 (async function bootstrap(){
